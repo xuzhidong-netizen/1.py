@@ -3,12 +3,14 @@
   --bg-bottom: #132b45;
   --card: rgba(8, 17, 31, 0.76);
   --line: rgba(255, 255, 255, 0.12);
+  --line-strong: rgba(255, 255, 255, 0.24);
   --text: #f4f7fb;
   --muted: #9db0c7;
   --gold: #ffd166;
   --cyan: #79e0ff;
   --red: #ff5d73;
   --green: #7ef0b2;
+  --shadow: 0 24px 80px rgba(0, 0, 0, 0.25);
 }
 
 * {
@@ -18,7 +20,7 @@
 body {
   margin: 0;
   min-height: 100vh;
-  font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+  font-family: Georgia, "Times New Roman", serif;
   color: var(--text);
   background:
     radial-gradient(circle at top, rgba(121, 224, 255, 0.22), transparent 30%),
@@ -78,7 +80,7 @@ h1 {
 
 .panel {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 12px;
   max-width: 440px;
 }
@@ -90,11 +92,17 @@ h1 {
   background: var(--card);
   backdrop-filter: blur(10px);
   border-radius: 24px;
-  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.25);
+  box-shadow: var(--shadow);
 }
 
 .stat {
   padding: 16px;
+}
+
+.stat-wide {
+  background:
+    linear-gradient(135deg, rgba(255, 209, 102, 0.16), rgba(121, 224, 255, 0.08)),
+    var(--card);
 }
 
 .stat span {
@@ -113,6 +121,10 @@ h1 {
   max-width: 440px;
   margin-top: 14px;
   padding: 18px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
 }
 
 .primary {
@@ -121,19 +133,62 @@ h1 {
   padding: 14px 24px;
   font-size: 1rem;
   font-weight: 700;
+  font-family: inherit;
   color: #07111f;
   background: linear-gradient(135deg, var(--gold), #fff0a9);
   cursor: pointer;
 }
 
+.ghost {
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  padding: 13px 18px;
+  font-size: 0.98rem;
+  font-weight: 700;
+  font-family: inherit;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.07);
+  cursor: pointer;
+}
+
 #message {
-  margin: 14px 0 0;
+  margin: 0;
+  width: 100%;
   color: var(--muted);
   line-height: 1.6;
 }
 
+.feature-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 18px;
+  color: var(--muted);
+}
+
+.feature-list p {
+  margin: 0;
+  padding-left: 18px;
+  position: relative;
+}
+
+.feature-list p::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.55em;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--gold);
+  box-shadow: 0 0 16px rgba(255, 209, 102, 0.8);
+}
+
 .game-shell {
   padding: 14px;
+}
+
+.canvas-wrap {
+  position: relative;
 }
 
 canvas {
@@ -144,6 +199,54 @@ canvas {
   background:
     linear-gradient(180deg, rgba(8, 17, 31, 0.2), rgba(8, 17, 31, 0.6)),
     linear-gradient(180deg, #10223a, #17375c);
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  border-radius: 18px;
+  background: rgba(5, 11, 21, 0.58);
+  backdrop-filter: blur(6px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 180ms ease;
+}
+
+.overlay.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.overlay-card {
+  width: min(100%, 320px);
+  padding: 24px;
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  background: rgba(8, 17, 31, 0.9);
+  text-align: center;
+  box-shadow: var(--shadow);
+}
+
+.overlay-tag {
+  margin: 0 0 10px;
+  color: var(--cyan);
+  letter-spacing: 0.24em;
+  font-size: 0.75rem;
+}
+
+.overlay-card h2 {
+  margin: 0;
+  font-size: 2rem;
+}
+
+.overlay-card p {
+  margin: 12px 0 18px;
+  color: var(--muted);
+  line-height: 1.6;
 }
 
 .touch-controls {
@@ -158,6 +261,7 @@ canvas {
   border-radius: 18px;
   min-height: 58px;
   font-size: 1.4rem;
+  font-family: inherit;
   color: var(--text);
   background: rgba(255, 255, 255, 0.08);
 }
@@ -175,5 +279,15 @@ canvas {
   .panel,
   .actions {
     max-width: none;
+  }
+}
+
+@media (max-width: 560px) {
+  .panel {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .overlay-card h2 {
+    font-size: 1.6rem;
   }
 }

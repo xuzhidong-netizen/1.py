@@ -4,6 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>星落接接乐</title>
+    <meta
+      name="description"
+      content="在线玩星落接接乐：接住星星、避开炸弹，挑战 60 秒最高分。"
+    />
     <link rel="stylesheet" href="./style.css" />
   </head>
   <body>
@@ -27,15 +31,37 @@
             <span>时间</span>
             <strong id="time">60</strong>
           </div>
+          <div class="stat stat-wide">
+            <span>最高分</span>
+            <strong id="bestScore">0</strong>
+          </div>
         </div>
         <div class="actions">
           <button id="startBtn" class="primary">开始游戏</button>
+          <button id="soundBtn" class="ghost" type="button">音效：开</button>
           <p id="message">按方向键移动，接住星星就能得分。</p>
+        </div>
+        <div class="feature-list">
+          <p>60 秒冲分模式</p>
+          <p>最高分自动保存在当前浏览器</p>
+          <p>支持键盘和触屏操作</p>
         </div>
       </section>
 
       <section class="game-shell">
-        <canvas id="gameCanvas" width="420" height="720"></canvas>
+        <div class="canvas-wrap">
+          <canvas id="gameCanvas" width="420" height="720"></canvas>
+          <div id="overlay" class="overlay visible">
+            <div class="overlay-card">
+              <p class="overlay-tag">STAR CATCHER</p>
+              <h2 id="overlayTitle">准备开局</h2>
+              <p id="overlayText">
+                接住星星拿分，撞到炸弹或漏接星星都会掉生命。
+              </p>
+              <button id="overlayBtn" class="primary" type="button">立即开始</button>
+            </div>
+          </div>
+        </div>
         <div class="touch-controls">
           <button id="leftBtn" aria-label="向左移动">←</button>
           <button id="rightBtn" aria-label="向右移动">→</button>

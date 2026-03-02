@@ -4,10 +4,26 @@ const ctx = canvas.getContext("2d");
 const scoreEl = document.getElementById("score");
 const livesEl = document.getElementById("lives");
 const timeEl = document.getElementById("time");
+const bestScoreEl = document.getElementById("bestScore");
 const messageEl = document.getElementById("message");
 const startBtn = document.getElementById("startBtn");
+const soundBtn = document.getElementById("soundBtn");
 const leftBtn = document.getElementById("leftBtn");
 const rightBtn = document.getElementById("rightBtn");
+const overlayEl = document.getElementById("overlay");
+const overlayTitleEl = document.getElementById("overlayTitle");
+const overlayTextEl = document.getElementById("overlayText");
+const overlayBtn = document.getElementById("overlayBtn");
+
+const BEST_SCORE_KEY = "star-catcher-best-score";
+const audioState = {
+  enabled: true,
+  context: null,
+};
+
+const bestScore = {
+  value: Number(localStorage.getItem(BEST_SCORE_KEY) || 0),
+};
 
 const game = {
   width: canvas.width,
@@ -32,7 +48,95 @@ const game = {
   },
 };
 
-function resetGame() {
+function showOverlay(title, text, buttonText) {
+  overlayTitleEl.textContent = title;
+  overlayTextEl.textContent = text;
+  overlayBtn.textContent = buttonText;
+  overlayEl.classList.add("visible");
+}
+
+function hideOverlay() {
+  overlayEl.classList.remove("visible");
+}
+
+function updateBestScore(nextScore) {
+  if (nextScore <= bestScore.value) {
+    return false;
+  }
+
+  bestScore.value = nextScore;
+  localStorage.setItem(BEST_SCORE_KEY, String(bestScore.value));
+  return true;
+}
+
+function updateHud() {
+  scoreEl.textContent = String(game.score);
+  livesEl.textContent = String(game.lives);
+  timeEl.textContent = String(game.timeLeft);
+  bestScoreEl.textContent = String(bestScore.value);
+}
+
+function getAudioContext() {
+  if (!audioState.enabled) {
+    return null;
+  }
+
+  const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+  if (!AudioContextClass) {
+    return null;
+  }
+
+  if (!audioState.context) {
+    audioState.context = new AudioContextClass();
+  }
+
+  if (audioState.context.state === "suspended") {
+    audioState.context.resume();
+  }
+
+  return audioState.context;
+}
+
+function playTone(type, frequency, duration, volume) {
+  const context = getAudioContext();
+  if (!context) {
+    return;
+  }
+
+  const oscillator = context.createOscillator();
+  const gainNode = context.createGain();
+  const startTime = context.currentTime;
+  const endTime = startTime + duration;
+
+  oscillator.type = type;
+  oscillator.frequency.setValueAtTime(frequency, startTime);
+  gainNode.gain.setValueAtTime(volume, startTime);
+  gainNode.gain.exponentialRampToValueAtTime(0.0001, endTime);
+
+  oscillator.connect(gainNode);
+  gainNode.connect(context.destination);
+  oscillator.start(startTime);
+  oscillator.stop(endTime);
+}
+
+function playCatchSound() {
+  playTone("triangle", 660, 0.12, 0.05);
+}
+
+function playHitSound() {
+  playTone("sawtooth", 180, 0.2, 0.06);
+}
+
+function playStartSound() {
+  playTone("sine", 440, 0.08, 0.04);
+  setTimeout(() => playTone("sine", 660, 0.12, 0.04), 80);
+}
+
+function setSoundLabel() {
+  soundBtn.textContent = `音效：${audioState.enabled ? "开" : "关"}`;
+}
+
+function startGame() {
   game.running = true;
   game.score = 0;
   game.lives = 3;
@@ -43,13 +147,9 @@ function resetGame() {
   game.items = [];
   game.player.x = canvas.width / 2 - game.player.width / 2;
   messageEl.textContent = "游戏开始，接住星星，躲开炸弹。";
+  hideOverlay();
   updateHud();
-}
-
-function updateHud() {
-  scoreEl.textContent = String(game.score);
-  livesEl.textContent = String(game.lives);
-  timeEl.textContent = String(game.timeLeft);
+  playStartSound();
 }
 
 function spawnItem() {
@@ -140,7 +240,17 @@ function intersects(item) {
 
 function endGame(reason) {
   game.running = false;
-  messageEl.textContent = `${reason} 最终得分 ${game.score}。点击“开始游戏”再来一局。`;
+  const isNewRecord = updateBestScore(game.score);
+  const resultText = isNewRecord
+    ? `${reason}，你打破了最高分，最终得分 ${game.score}。`
+    : `${reason}，最终得分 ${game.score}。`;
+  messageEl.textContent = `${resultText} 点击“开始游戏”再来一局。`;
+  showOverlay(
+    isNewRecord ? "新纪录" : "本局结束",
+    `${reason}，本局得分 ${game.score}，最高分 ${bestScore.value}。`,
+    "再来一局"
+  );
+  updateHud();
 }
 
 function update(delta) {
@@ -183,9 +293,12 @@ function update(delta) {
     if (intersects(item)) {
       if (item.kind === "star") {
         game.score += 10;
+        playCatchSound();
       } else {
         game.lives -= 1;
+        playHitSound();
       }
+      updateBestScore(game.score);
       updateHud();
       if (game.lives <= 0) {
         endGame("生命耗尽");
@@ -196,6 +309,7 @@ function update(delta) {
     if (item.y - item.radius > game.height) {
       if (item.kind === "star") {
         game.lives -= 1;
+        playHitSound();
         updateHud();
         if (game.lives <= 0) {
           endGame("漏接太多星星");
@@ -269,8 +383,19 @@ function bindPress(button, direction) {
 bindPress(leftBtn, "left");
 bindPress(rightBtn, "right");
 
-startBtn.addEventListener("click", resetGame);
+startBtn.addEventListener("click", startGame);
+overlayBtn.addEventListener("click", startGame);
+soundBtn.addEventListener("click", () => {
+  audioState.enabled = !audioState.enabled;
+  setSoundLabel();
+});
 
 updateHud();
+setSoundLabel();
+showOverlay(
+  "准备开局",
+  "星星加分，炸弹扣命，漏接星星也会损失生命。",
+  "立即开始"
+);
 drawScene();
 requestAnimationFrame(loop);
