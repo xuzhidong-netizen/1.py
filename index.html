@@ -6,317 +6,111 @@
     <title>小游戏大厅</title>
     <meta
       name="description"
-      content="小游戏大厅：在同一页面选择游玩多个单机小游戏，随时切换、随时开玩。"
+      content="4399 风格单机游戏厅首页，点击游戏即可跳转到独立页面开始玩。"
     />
     <link rel="stylesheet" href="./style.css" />
   </head>
-  <body>
-    <main class="app">
-      <section class="hero">
-        <p class="eyebrow">GAME LOUNGE</p>
-        <h1>小游戏大厅</h1>
-        <p class="intro">
-          一个页面，五种玩法。动作、牌类、策略、记忆、反应都在这里，点一下就能切换，后面继续加新游戏也沿用同一套结构。
-        </p>
-
-        <div class="hero-actions">
-          <button id="playSelectedBtn" class="primary" type="button">开始当前游戏</button>
-          <button id="playRandomBtn" class="ghost" type="button">随机来一局</button>
-        </div>
-
-        <div class="hero-stats">
-          <div class="hero-stat">
-            <span>当前游戏数</span>
-            <strong>5</strong>
+  <body class="home-page">
+    <main class="home-shell">
+      <section class="home-hero">
+        <div>
+          <p class="eyebrow">MINI ARCADE</p>
+          <h1>单机游戏厅</h1>
+          <p class="hero-copy">
+            参照经典小游戏站点的感觉重做了首页。先看游戏列表，选中后跳转到独立游戏页开始玩，不再挤在一个页面里。
+          </p>
+          <div class="hero-actions">
+            <a class="primary" href="./play.html?game=star">马上开玩</a>
+            <a class="ghost" href="./play.html?game=snake">随机热门</a>
           </div>
-          <div class="hero-stat">
-            <span>全部模式</span>
+        </div>
+        <div class="hero-stats">
+          <div class="hero-stat-card">
+            <span>游戏总数</span>
+            <strong>10</strong>
+          </div>
+          <div class="hero-stat-card">
+            <span>当前模式</span>
             <strong>单机</strong>
           </div>
-          <div class="hero-stat">
-            <span>切换方式</span>
-            <strong>即点即玩</strong>
+          <div class="hero-stat-card">
+            <span>进入方式</span>
+            <strong>点卡跳转</strong>
           </div>
-        </div>
-
-        <div class="spotlight-card">
-          <p class="panel-tag">TODAY'S PICK</p>
-          <h3 id="spotlightTitle">星落接接乐</h3>
-          <p id="spotlightDescription" class="network-text">
-            接住星星，避开炸弹，适合先热手。
-          </p>
-          <div class="spotlight-meta">
-            <div>
-              <span>类型</span>
-              <strong id="spotlightGenre">动作反应</strong>
-            </div>
-            <div>
-              <span>难度</span>
-              <strong id="spotlightDifficulty">简单上手</strong>
-            </div>
-            <div>
-              <span>推荐时长</span>
-              <strong id="spotlightDuration">1 分钟</strong>
-            </div>
-          </div>
-          <p id="spotlightHint" class="network-tip">键盘或触屏都能玩，适合先来一把。</p>
-        </div>
-
-        <div class="lobby-grid">
-          <button class="game-card active" data-game-select="star">
-            <span class="game-card-tag">动作</span>
-            <strong>星落接接乐</strong>
-            <small>接住星星，躲开炸弹，60 秒冲分。</small>
-          </button>
-          <button class="game-card" data-game-select="ddz">
-            <span class="game-card-tag">牌类</span>
-            <strong>斗地主小游戏</strong>
-            <small>单机快速局，和两个 AI 对战。</small>
-          </button>
-          <button class="game-card" data-game-select="ttt">
-            <span class="game-card-tag">策略</span>
-            <strong>井字棋</strong>
-            <small>和电脑轮流落子，先连成三子获胜。</small>
-          </button>
-          <button class="game-card" data-game-select="memory">
-            <span class="game-card-tag">益智</span>
-            <strong>记忆翻牌</strong>
-            <small>翻开相同图案配对，尽量少走步数。</small>
-          </button>
-          <button class="game-card" data-game-select="mole">
-            <span class="game-card-tag">反应</span>
-            <strong>打地鼠</strong>
-            <small>30 秒快打模式，地鼠冒头就点它。</small>
-          </button>
-        </div>
-
-        <div class="lobby-notes">
-          <p>统一大厅入口，后续新增游戏按同样方式挂载。</p>
-          <p>全部改回单机模式，打开页面就能直接玩。</p>
-          <p>支持桌面和手机宽度，切换游戏不跳页。</p>
         </div>
       </section>
 
-      <section class="stage">
-        <article class="game-panel active" data-game-panel="star">
-          <div class="panel-head">
-            <div>
-              <p class="panel-tag">ARCADE</p>
-              <h2>星落接接乐</h2>
-            </div>
-            <div class="panel-actions">
-              <button id="starStartBtn" class="primary" type="button">开始游戏</button>
-              <button id="starSoundBtn" class="ghost" type="button">音效：开</button>
-            </div>
-          </div>
+      <section class="category-strip">
+        <span>热门动作</span>
+        <span>卡牌策略</span>
+        <span>脑力益智</span>
+        <span>休闲反应</span>
+        <span>经典街机</span>
+      </section>
 
-          <div class="stats-grid">
-            <div class="stat">
-              <span>得分</span>
-              <strong id="starScore">0</strong>
-            </div>
-            <div class="stat">
-              <span>生命</span>
-              <strong id="starLives">3</strong>
-            </div>
-            <div class="stat">
-              <span>时间</span>
-              <strong id="starTime">60</strong>
-            </div>
-            <div class="stat highlight">
-              <span>最高分</span>
-              <strong id="starBestScore">0</strong>
-            </div>
-          </div>
-
-          <p id="starMessage" class="panel-message">
-            按方向键移动，接住星星就能得分。
+      <section class="featured-banner">
+        <div>
+          <p class="panel-tag">HOT TODAY</p>
+          <h2>贪吃蛇、2048、打砖块已经加入游戏厅</h2>
+          <p>
+            现有 10 个单机小游戏。点开即跳转到专属游玩页，避免首页过长，也更接近小游戏站的使用方式。
           </p>
+        </div>
+        <a class="primary" href="./play.html?game=breakout">先玩打砖块</a>
+      </section>
 
-          <div class="canvas-wrap">
-            <canvas id="starCanvas" width="420" height="720"></canvas>
-            <div id="starOverlay" class="overlay visible">
-              <div class="overlay-card">
-                <p class="overlay-tag">STAR CATCHER</p>
-                <h3 id="starOverlayTitle">准备开局</h3>
-                <p id="starOverlayText">
-                  接住星星加分，碰到炸弹或漏接星星都会掉生命。
-                </p>
-                <button id="starOverlayBtn" class="primary" type="button">立即开始</button>
-              </div>
-            </div>
-          </div>
-
-          <div class="touch-controls">
-            <button id="starLeftBtn" aria-label="向左移动" type="button">←</button>
-            <button id="starRightBtn" aria-label="向右移动" type="button">→</button>
-          </div>
-        </article>
-
-        <article class="game-panel" data-game-panel="ddz">
-          <div class="panel-head">
-            <div>
-              <p class="panel-tag">CARD BATTLE</p>
-              <h2>简化版斗地主</h2>
-            </div>
-            <div class="panel-actions">
-              <button id="ddzRestartBtn" class="primary" type="button">新开一局</button>
-            </div>
-          </div>
-
-          <div class="ddz-topbar">
-            <div class="stat">
-              <span>当前阶段</span>
-              <strong id="ddzPhase">叫地主</strong>
-            </div>
-            <div class="stat">
-              <span>地主</span>
-              <strong id="ddzLandlord">待定</strong>
-            </div>
-            <div class="stat highlight">
-              <span>桌面牌</span>
-              <strong id="ddzLastPlay">暂无</strong>
-            </div>
-          </div>
-
-          <p id="ddzMessage" class="panel-message">
-            这是快速局斗地主，支持单张、对子、三张、炸弹和王炸。
-          </p>
-
-          <section class="ddz-table">
-            <div class="ddz-opponent">
-              <div class="player-head">
-                <strong>左侧 AI</strong>
-                <span id="ddzLeftCount">17 张</span>
-              </div>
-              <div id="ddzLeftCards" class="opponent-cards" aria-label="左侧 AI 手牌"></div>
-              <p id="ddzLeftAction" class="player-action">等待发牌</p>
-            </div>
-
-            <div class="ddz-center">
-              <div class="bottom-cards-box">
-                <span>底牌</span>
-                <div id="ddzBottomCards" class="bottom-cards"></div>
-              </div>
-              <div class="center-play-box">
-                <span>本轮牌型</span>
-                <div id="ddzCurrentCombo" class="combo-display">暂无</div>
-              </div>
-            </div>
-
-            <div class="ddz-opponent">
-              <div class="player-head">
-                <strong>右侧 AI</strong>
-                <span id="ddzRightCount">17 张</span>
-              </div>
-              <div id="ddzRightCards" class="opponent-cards" aria-label="右侧 AI 手牌"></div>
-              <p id="ddzRightAction" class="player-action">等待发牌</p>
-            </div>
-          </section>
-
-          <section class="ddz-player-area">
-            <div class="player-head">
-              <strong>你</strong>
-              <span id="ddzRole">农民</span>
-            </div>
-            <div id="ddzHand" class="player-hand" aria-label="你的手牌"></div>
-          </section>
-
-          <div class="ddz-controls">
-            <button id="ddzCallBtn" class="primary" type="button">叫地主</button>
-            <button id="ddzPassCallBtn" class="ghost" type="button">不叫</button>
-            <button id="ddzPlayBtn" class="primary" type="button">出牌</button>
-            <button id="ddzPassBtn" class="ghost" type="button">不出</button>
-            <button id="ddzHintBtn" class="ghost" type="button">提示</button>
-          </div>
-        </article>
-
-        <article class="game-panel" data-game-panel="ttt">
-          <div class="panel-head">
-            <div>
-              <p class="panel-tag">TACTIC</p>
-              <h2>井字棋</h2>
-            </div>
-            <div class="panel-actions">
-              <button id="tttRestartBtn" class="primary" type="button">重新开始</button>
-            </div>
-          </div>
-          <div class="mini-topbar">
-            <div class="stat">
-              <span>当前回合</span>
-              <strong id="tttTurn">你</strong>
-            </div>
-            <div class="stat highlight">
-              <span>比分</span>
-              <strong id="tttScore">0 : 0</strong>
-            </div>
-            <div class="stat">
-              <span>对手</span>
-              <strong>电脑</strong>
-            </div>
-          </div>
-          <p id="tttMessage" class="panel-message">你使用 X，电脑使用 O。</p>
-          <div id="tttBoard" class="ttt-board" aria-label="井字棋棋盘"></div>
-        </article>
-
-        <article class="game-panel" data-game-panel="memory">
-          <div class="panel-head">
-            <div>
-              <p class="panel-tag">MEMORY</p>
-              <h2>记忆翻牌</h2>
-            </div>
-            <div class="panel-actions">
-              <button id="memoryRestartBtn" class="primary" type="button">重新洗牌</button>
-            </div>
-          </div>
-          <div class="mini-topbar">
-            <div class="stat">
-              <span>步数</span>
-              <strong id="memoryMoves">0</strong>
-            </div>
-            <div class="stat">
-              <span>配对</span>
-              <strong id="memoryPairs">0 / 8</strong>
-            </div>
-            <div class="stat highlight">
-              <span>最好成绩</span>
-              <strong id="memoryBest">-</strong>
-            </div>
-          </div>
-          <p id="memoryMessage" class="panel-message">翻开两张相同卡片即可配对。</p>
-          <div id="memoryGrid" class="memory-grid" aria-label="记忆翻牌区域"></div>
-        </article>
-
-        <article class="game-panel" data-game-panel="mole">
-          <div class="panel-head">
-            <div>
-              <p class="panel-tag">ARCADE</p>
-              <h2>打地鼠</h2>
-            </div>
-            <div class="panel-actions">
-              <button id="moleStartBtn" class="primary" type="button">开始 30 秒挑战</button>
-            </div>
-          </div>
-          <div class="mini-topbar">
-            <div class="stat">
-              <span>得分</span>
-              <strong id="moleScore">0</strong>
-            </div>
-            <div class="stat">
-              <span>时间</span>
-              <strong id="moleTime">30</strong>
-            </div>
-            <div class="stat highlight">
-              <span>最高分</span>
-              <strong id="moleBest">0</strong>
-            </div>
-          </div>
-          <p id="moleMessage" class="panel-message">点击冒出来的地鼠，空点不扣分。</p>
-          <div id="moleGrid" class="mole-grid" aria-label="打地鼠区域"></div>
-        </article>
+      <section class="game-gallery">
+        <a class="gallery-card hot" href="./play.html?game=star">
+          <span class="game-card-tag">动作</span>
+          <strong>星落接接乐</strong>
+          <p>接住星星、躲开炸弹，60 秒冲分。</p>
+        </a>
+        <a class="gallery-card" href="./play.html?game=ddz">
+          <span class="game-card-tag">牌类</span>
+          <strong>斗地主小游戏</strong>
+          <p>单机快速局，和两个 AI 对战。</p>
+        </a>
+        <a class="gallery-card" href="./play.html?game=ttt">
+          <span class="game-card-tag">策略</span>
+          <strong>井字棋</strong>
+          <p>经典三连线，适合快速来一局。</p>
+        </a>
+        <a class="gallery-card" href="./play.html?game=memory">
+          <span class="game-card-tag">益智</span>
+          <strong>记忆翻牌</strong>
+          <p>翻开相同图案完成配对。</p>
+        </a>
+        <a class="gallery-card" href="./play.html?game=mole">
+          <span class="game-card-tag">反应</span>
+          <strong>打地鼠</strong>
+          <p>30 秒快打模式，拼手速和眼力。</p>
+        </a>
+        <a class="gallery-card hot" href="./play.html?game=snake">
+          <span class="game-card-tag">街机</span>
+          <strong>贪吃蛇</strong>
+          <p>吃豆变长，撞墙或撞自己就结束。</p>
+        </a>
+        <a class="gallery-card" href="./play.html?game=2048">
+          <span class="game-card-tag">数字</span>
+          <strong>2048</strong>
+          <p>滑动合成更大的数字方块。</p>
+        </a>
+        <a class="gallery-card" href="./play.html?game=rps">
+          <span class="game-card-tag">休闲</span>
+          <strong>石头剪刀布</strong>
+          <p>三局两胜，适合摸鱼快玩。</p>
+        </a>
+        <a class="gallery-card" href="./play.html?game=reaction">
+          <span class="game-card-tag">测试</span>
+          <strong>反应速度测试</strong>
+          <p>等信号变绿后立刻点击，刷新最快成绩。</p>
+        </a>
+        <a class="gallery-card hot" href="./play.html?game=breakout">
+          <span class="game-card-tag">经典</span>
+          <strong>打砖块</strong>
+          <p>接住小球，清光砖块就过关。</p>
+        </a>
       </section>
     </main>
-
-    <script src="./game.js"></script>
   </body>
 </html>
