@@ -6,7 +6,7 @@
     <title>小游戏大厅</title>
     <meta
       name="description"
-      content="小游戏大厅：在同一页面选择游玩星落接接乐和简化版斗地主。"
+      content="小游戏大厅：在同一页面选择游玩多个单机小游戏，随时切换、随时开玩。"
     />
     <link rel="stylesheet" href="./style.css" />
   </head>
@@ -16,8 +16,51 @@
         <p class="eyebrow">GAME LOUNGE</p>
         <h1>小游戏大厅</h1>
         <p class="intro">
-          现在这个页面已经改成统一入口。你可以先玩星落接接乐，也可以切到简化版斗地主，后面继续加新游戏也沿用这一套结构。
+          一个页面，五种玩法。动作、牌类、策略、记忆、反应都在这里，点一下就能切换，后面继续加新游戏也沿用同一套结构。
         </p>
+
+        <div class="hero-actions">
+          <button id="playSelectedBtn" class="primary" type="button">开始当前游戏</button>
+          <button id="playRandomBtn" class="ghost" type="button">随机来一局</button>
+        </div>
+
+        <div class="hero-stats">
+          <div class="hero-stat">
+            <span>当前游戏数</span>
+            <strong>5</strong>
+          </div>
+          <div class="hero-stat">
+            <span>全部模式</span>
+            <strong>单机</strong>
+          </div>
+          <div class="hero-stat">
+            <span>切换方式</span>
+            <strong>即点即玩</strong>
+          </div>
+        </div>
+
+        <div class="spotlight-card">
+          <p class="panel-tag">TODAY'S PICK</p>
+          <h3 id="spotlightTitle">星落接接乐</h3>
+          <p id="spotlightDescription" class="network-text">
+            接住星星，避开炸弹，适合先热手。
+          </p>
+          <div class="spotlight-meta">
+            <div>
+              <span>类型</span>
+              <strong id="spotlightGenre">动作反应</strong>
+            </div>
+            <div>
+              <span>难度</span>
+              <strong id="spotlightDifficulty">简单上手</strong>
+            </div>
+            <div>
+              <span>推荐时长</span>
+              <strong id="spotlightDuration">1 分钟</strong>
+            </div>
+          </div>
+          <p id="spotlightHint" class="network-tip">键盘或触屏都能玩，适合先来一把。</p>
+        </div>
 
         <div class="lobby-grid">
           <button class="game-card active" data-game-select="star">
@@ -49,8 +92,8 @@
 
         <div class="lobby-notes">
           <p>统一大厅入口，后续新增游戏按同样方式挂载。</p>
-          <p>当前已接入 5 个游戏模块。</p>
-          <p>界面支持桌面和手机宽度。</p>
+          <p>全部改回单机模式，打开页面就能直接玩。</p>
+          <p>支持桌面和手机宽度，切换游戏不跳页。</p>
         </div>
       </section>
 
@@ -206,6 +249,10 @@
             <div class="stat highlight">
               <span>比分</span>
               <strong id="tttScore">0 : 0</strong>
+            </div>
+            <div class="stat">
+              <span>对手</span>
+              <strong>电脑</strong>
             </div>
           </div>
           <p id="tttMessage" class="panel-message">你使用 X，电脑使用 O。</p>

@@ -1,6 +1,72 @@
 const gameButtons = document.querySelectorAll("[data-game-select]");
 const gamePanels = document.querySelectorAll("[data-game-panel]");
 const gameModules = {};
+const playSelectedBtn = document.getElementById("playSelectedBtn");
+const playRandomBtn = document.getElementById("playRandomBtn");
+const spotlightTitleEl = document.getElementById("spotlightTitle");
+const spotlightDescriptionEl = document.getElementById("spotlightDescription");
+const spotlightGenreEl = document.getElementById("spotlightGenre");
+const spotlightDifficultyEl = document.getElementById("spotlightDifficulty");
+const spotlightDurationEl = document.getElementById("spotlightDuration");
+const spotlightHintEl = document.getElementById("spotlightHint");
+
+const lobbyInfo = {
+  star: {
+    title: "星落接接乐",
+    description: "接住星星、躲开炸弹，节奏快，适合先热手。",
+    genre: "动作反应",
+    difficulty: "简单上手",
+    duration: "1 分钟",
+    hint: "方向键或屏幕按钮都能玩，追求高分很上头。",
+  },
+  ddz: {
+    title: "斗地主小游戏",
+    description: "单机快速局，和两个 AI 对战，适合慢一点思考。",
+    genre: "牌类策略",
+    difficulty: "中等",
+    duration: "3-5 分钟",
+    hint: "支持单张、对子、三张、炸弹和王炸，适合休闲局。",
+  },
+  ttt: {
+    title: "井字棋",
+    description: "和电脑轮流落子，经典三连线小游戏。",
+    genre: "轻策略",
+    difficulty: "简单",
+    duration: "30 秒",
+    hint: "抢中心、堵对角，适合快速来一局。",
+  },
+  memory: {
+    title: "记忆翻牌",
+    description: "记住翻开的图案位置，用更少步数完成配对。",
+    genre: "记忆益智",
+    difficulty: "中等",
+    duration: "2 分钟",
+    hint: "越专注越容易刷出新纪录，适合连续挑战。",
+  },
+  mole: {
+    title: "打地鼠",
+    description: "30 秒快打模式，拼手速和反应。",
+    genre: "极限反应",
+    difficulty: "刺激",
+    duration: "30 秒",
+    hint: "适合手机点按，节奏紧凑，能快速来好几局。",
+  },
+};
+
+let currentGameId = "star";
+
+function updateSpotlight(gameId) {
+  const info = lobbyInfo[gameId];
+  if (!info) {
+    return;
+  }
+  spotlightTitleEl.textContent = info.title;
+  spotlightDescriptionEl.textContent = info.description;
+  spotlightGenreEl.textContent = info.genre;
+  spotlightDifficultyEl.textContent = info.difficulty;
+  spotlightDurationEl.textContent = info.duration;
+  spotlightHintEl.textContent = info.hint;
+}
 
 function switchGame(gameId) {
   gameButtons.forEach((button) => {
@@ -9,6 +75,8 @@ function switchGame(gameId) {
   gamePanels.forEach((panel) => {
     panel.classList.toggle("active", panel.dataset.gamePanel === gameId);
   });
+  currentGameId = gameId;
+  updateSpotlight(gameId);
   Object.entries(gameModules).forEach(([id, module]) => {
     module.active = id === gameId;
   });
@@ -1121,7 +1189,10 @@ const ticTacToe = (() => {
   }
 
   function handleHumanMove(index) {
-    if (state.board[index] || state.locked || state.turn !== "human") {
+    if (state.board[index] || state.locked) {
+      return;
+    }
+    if (state.turn !== "human") {
       return;
     }
     state.board[index] = "X";
@@ -1381,5 +1452,23 @@ const moleGame = (() => {
   return state;
 })();
 gameModules.mole = moleGame;
+
+playSelectedBtn.addEventListener("click", () => {
+  switchGame(currentGameId);
+  window.scrollTo({
+    top: document.querySelector(`[data-game-panel="${currentGameId}"]`).offsetTop - 12,
+    behavior: "smooth",
+  });
+});
+
+playRandomBtn.addEventListener("click", () => {
+  const ids = Object.keys(lobbyInfo);
+  const randomId = ids[Math.floor(Math.random() * ids.length)];
+  switchGame(randomId);
+  window.scrollTo({
+    top: document.querySelector(`[data-game-panel="${randomId}"]`).offsetTop - 12,
+    behavior: "smooth",
+  });
+});
 
 switchGame("star");
