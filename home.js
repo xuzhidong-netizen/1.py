@@ -234,6 +234,11 @@ clearSearchBtn.addEventListener("click", () => {
 });
 
 jumpToResultsBtn.addEventListener("click", scrollToGallery);
+gameSearchInput.addEventListener("keydown", (event) => {
+  if (event.key === "Enter" && state.search.trim()) {
+    scrollToGallery();
+  }
+});
 
 homeTotalGamesEl.textContent = String(catalogEntries.length);
 renderCategories();

@@ -387,12 +387,18 @@ h1 {
   padding: 24px 28px;
 }
 
+.gallery-toolbar {
+  position: relative;
+  z-index: 3;
+}
+
 .game-gallery {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 16px;
   margin-top: 18px;
   align-items: start;
+  scroll-margin-top: 110px;
 }
 
 .gallery-card {
@@ -525,6 +531,46 @@ body.is-discovering .home-hero h1 {
 
 body.is-discovering .hero-stats {
   grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+body.is-discovering .gallery-toolbar {
+  position: sticky;
+  top: 12px;
+  background:
+    linear-gradient(180deg, rgba(8, 19, 35, 0.96), rgba(8, 19, 35, 0.9)),
+    var(--card);
+  backdrop-filter: blur(14px);
+}
+
+body.is-discovering .discover-panel {
+  margin-bottom: 10px;
+}
+
+body.is-discovering .ranking-panel {
+  display: none;
+}
+
+body.is-discovering .discover-main {
+  position: sticky;
+  top: 12px;
+  z-index: 4;
+  padding: 18px 20px;
+}
+
+body.is-discovering .category-strip {
+  margin-top: 8px;
+}
+
+body.is-discovering .quick-tags {
+  display: none;
+}
+
+body.is-discovering .gallery-toolbar h2 {
+  font-size: 1.5rem;
+}
+
+body.is-discovering .gallery-stats {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .play-shell {
@@ -754,6 +800,7 @@ canvas {
   background:
     linear-gradient(180deg, rgba(7, 18, 34, 0.25), rgba(7, 18, 34, 0.55)),
     linear-gradient(180deg, #0f2138, #1b4069);
+  touch-action: manipulation;
 }
 
 .overlay {
@@ -787,6 +834,11 @@ canvas {
 
 .touch-controls {
   margin-top: 14px;
+  justify-content: stretch;
+}
+
+.touch-controls button {
+  min-width: 110px;
 }
 
 .ddz-table {
@@ -1121,6 +1173,11 @@ canvas {
   .ddz-table {
     grid-template-columns: 1fr;
   }
+
+  body.is-discovering .discover-main,
+  body.is-discovering .gallery-toolbar {
+    position: static;
+  }
 }
 
 @media (max-width: 720px) {
@@ -1159,6 +1216,18 @@ canvas {
     grid-template-columns: 1fr;
   }
 
+  .home-hero,
+  .discover-main,
+  .gallery-toolbar,
+  .ranking-panel {
+    padding: 18px;
+    border-radius: 22px;
+  }
+
+  .home-hero h1 {
+    font-size: clamp(2.2rem, 12vw, 3.2rem);
+  }
+
   .category-strip,
   .quick-tags,
   .gallery-actions {
@@ -1180,6 +1249,19 @@ canvas {
 
   .gallery-stats {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .gallery-actions {
+    width: 100%;
+  }
+
+  .gallery-actions .ghost,
+  .gallery-actions .hero-stats {
+    width: 100%;
+  }
+
+  .gallery-actions .ghost {
+    text-align: center;
   }
 
   .game-gallery,
@@ -1252,6 +1334,74 @@ canvas {
 
   .sidebar-card h2 {
     font-size: 1.05rem;
+  }
+
+  .meta-strip,
+  .stats-grid,
+  .ddz-topbar,
+  .mini-topbar {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .panel-head h2 {
+    font-size: 1.6rem;
+  }
+
+  .compact-canvas canvas,
+  #starCanvas,
+  #snakeCanvas,
+  #breakoutCanvas {
+    max-height: 58vh;
+  }
+
+  .touch-controls {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .touch-controls button,
+  .panel-actions .primary,
+  .panel-actions .ghost,
+  .ddz-controls button,
+  .rps-controls button {
+    min-height: 48px;
+  }
+
+  .memory-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .memory-card {
+    min-height: 78px;
+    border-radius: 16px;
+    font-size: 1.45rem;
+  }
+
+  .mole-grid {
+    gap: 10px;
+  }
+
+  .mole-hole {
+    min-height: 100px;
+    border-radius: 18px;
+  }
+
+  .mole-btn {
+    width: 62px;
+    height: 62px;
+    font-size: 1.45rem;
+  }
+
+  .reaction-pad {
+    min-height: 160px;
+    border-radius: 20px;
+    font-size: 1.1rem;
+  }
+
+  body.is-discovering .discover-main,
+  body.is-discovering .gallery-toolbar {
+    position: static;
   }
 
   .ttt-cell {
