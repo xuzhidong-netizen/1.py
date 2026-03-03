@@ -514,6 +514,39 @@ h1 {
   background: rgba(255, 255, 255, 0.04);
 }
 
+.crawl-links {
+  margin-top: 20px;
+  padding: 24px;
+  border: 1px solid var(--line);
+  border-radius: 28px;
+  background: rgba(8, 19, 35, 0.68);
+  backdrop-filter: blur(10px);
+  box-shadow: var(--shadow);
+}
+
+.crawl-copy h2 {
+  margin-bottom: 10px;
+}
+
+.crawl-link-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.crawl-link-grid a {
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.crawl-link-grid a:hover {
+  border-color: rgba(255, 209, 102, 0.55);
+}
+
 body.is-discovering .featured-banner {
   display: none;
 }
@@ -1421,6 +1454,10 @@ canvas {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
+  .crawl-link-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
   .play-shell,
   .home-hero {
     grid-template-columns: 1fr;
@@ -1529,6 +1566,15 @@ canvas {
   .compact-results {
     grid-template-columns: 1fr;
     gap: 10px;
+  }
+
+  .crawl-links {
+    padding: 18px;
+    border-radius: 22px;
+  }
+
+  .crawl-link-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .gallery-card,

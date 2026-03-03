@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://xuzhidong-netizen.github.io/1.py/sitemap.xml

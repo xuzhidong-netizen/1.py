@@ -3,21 +3,52 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>小游戏大厅</title>
+    <title>冬冬游戏厅 - 在线单机小游戏大厅</title>
     <meta
       name="description"
-      content="4399 风格单机游戏厅首页，点击游戏即可跳转到独立页面开始玩。"
+      content="冬冬游戏厅提供 20 款在线单机小游戏，包含动作、益智、棋类、休闲等分类，打开网页即可直接游玩。"
+    />
+    <meta
+      name="keywords"
+      content="冬冬游戏厅,小游戏大厅,在线小游戏,单机游戏,网页游戏,五子棋,斗地主,打砖块,贪吃蛇"
+    />
+    <meta name="robots" content="index,follow,max-image-preview:large" />
+    <meta name="apple-mobile-web-app-title" content="冬冬游戏厅" />
+    <link rel="canonical" href="https://xuzhidong-netizen.github.io/1.py/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="冬冬游戏厅" />
+    <meta property="og:title" content="冬冬游戏厅 - 在线单机小游戏大厅" />
+    <meta
+      property="og:description"
+      content="冬冬游戏厅提供 20 款在线单机小游戏，点击即可进入独立游戏页直接开始。"
+    />
+    <meta property="og:url" content="https://xuzhidong-netizen.github.io/1.py/" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="冬冬游戏厅 - 在线单机小游戏大厅" />
+    <meta
+      name="twitter:description"
+      content="冬冬游戏厅提供动作、益智、棋类、休闲等 20 款在线小游戏。"
     />
     <link rel="stylesheet" href="./style.css" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "冬冬游戏厅",
+        "url": "https://xuzhidong-netizen.github.io/1.py/",
+        "description": "冬冬游戏厅提供 20 款在线单机小游戏，打开网页即可直接游玩。",
+        "inLanguage": "zh-CN"
+      }
+    </script>
   </head>
   <body class="home-page">
     <main class="home-shell">
       <section class="home-hero">
         <div>
           <p class="eyebrow">MINI ARCADE</p>
-          <h1>单机游戏厅</h1>
+          <h1>冬冬游戏厅</h1>
           <p class="hero-copy">
-            参照经典小游戏站点的感觉重做了首页。先看游戏列表，选中后跳转到独立游戏页开始玩，不再挤在一个页面里。
+            冬冬游戏厅收录了动作、益智、棋类、休闲等 20 款在线单机小游戏。点首页卡片即可跳转到独立游戏页直接开始，不需要注册和下载。
           </p>
           <div class="hero-actions">
             <button class="primary" type="button" data-open-game="star">马上开玩</button>
@@ -27,7 +58,7 @@
           <div class="hero-stats">
             <div class="hero-stat-card">
               <span>游戏总数</span>
-              <strong id="homeTotalGames">10</strong>
+              <strong id="homeTotalGames">20</strong>
             </div>
             <div class="hero-stat-card">
               <span>当前模式</span>
@@ -94,13 +125,45 @@
           </div>
           <div class="hero-stat-card">
             <span>可玩游戏</span>
-            <strong id="visibleGameCount">10</strong>
+            <strong id="visibleGameCount">20</strong>
           </div>
           </div>
         </div>
       </section>
 
       <section class="game-gallery" id="gameGallery">
+      </section>
+
+      <section class="crawl-links">
+        <div class="crawl-copy">
+          <p class="eyebrow">SITE MAP</p>
+          <h2>冬冬游戏厅全部游戏入口</h2>
+          <p class="panel-message">
+            下面是静态游戏链接，方便搜索引擎和访客快速发现冬冬游戏厅中的所有页面。
+          </p>
+        </div>
+        <nav class="crawl-link-grid" aria-label="冬冬游戏厅静态游戏链接">
+          <a href="./play.html?game=star">星落接接乐</a>
+          <a href="./play.html?game=ddz">斗地主小游戏</a>
+          <a href="./play.html?game=ttt">井字棋</a>
+          <a href="./play.html?game=memory">记忆翻牌</a>
+          <a href="./play.html?game=mole">打地鼠</a>
+          <a href="./play.html?game=snake">贪吃蛇</a>
+          <a href="./play.html?game=2048">2048</a>
+          <a href="./play.html?game=rps">石头剪刀布</a>
+          <a href="./play.html?game=reaction">反应速度测试</a>
+          <a href="./play.html?game=breakout">打砖块</a>
+          <a href="./play.html?game=gomoku">五子棋</a>
+          <a href="./play.html?game=liuzi">六子棋</a>
+          <a href="./play.html?game=connect4">四子棋</a>
+          <a href="./play.html?game=reversi">黑白棋</a>
+          <a href="./play.html?game=checkers">跳棋对战</a>
+          <a href="./play.html?game=sudoku">迷你数独</a>
+          <a href="./play.html?game=mines">扫雷棋盘</a>
+          <a href="./play.html?game=hanoi">汉诺塔</a>
+          <a href="./play.html?game=lights">熄灯棋</a>
+          <a href="./play.html?game=hexpawn">兵卒棋</a>
+        </nav>
       </section>
     </main>
     <script src="./catalog.js"></script>
