@@ -340,6 +340,197 @@
             <canvas id="breakoutCanvas" width="520" height="640"></canvas>
           </div>
         </article>
+
+        <article class="game-panel" data-game-panel="gomoku">
+          <div class="panel-head">
+            <div>
+              <p class="panel-tag">BOARD</p>
+              <h2>五子棋</h2>
+            </div>
+            <div class="panel-actions">
+              <button id="gomokuRestartBtn" class="primary" type="button">重新开始</button>
+            </div>
+          </div>
+          <div class="mini-topbar">
+            <div class="stat"><span>轮到</span><strong id="gomokuTurn">你</strong></div>
+            <div class="stat"><span>棋盘</span><strong>10 x 10</strong></div>
+            <div class="stat highlight"><span>目标</span><strong>连成五子</strong></div>
+          </div>
+          <p id="gomokuMessage" class="panel-message">你执黑先手，点击空格落子。</p>
+          <div id="gomokuBoard" class="board-grid gomoku-grid" aria-label="五子棋棋盘"></div>
+        </article>
+
+        <article class="game-panel" data-game-panel="liuzi">
+          <div class="panel-head">
+            <div>
+              <p class="panel-tag">BOARD</p>
+              <h2>六子棋</h2>
+            </div>
+            <div class="panel-actions">
+              <button id="liuziRestartBtn" class="primary" type="button">重新开始</button>
+            </div>
+          </div>
+          <div class="mini-topbar">
+            <div class="stat"><span>轮到</span><strong id="liuziTurn">你</strong></div>
+            <div class="stat"><span>棋盘</span><strong>11 x 11</strong></div>
+            <div class="stat highlight"><span>目标</span><strong>连成六子</strong></div>
+          </div>
+          <p id="liuziMessage" class="panel-message">你执黑先手，连成六子即可获胜。</p>
+          <div id="liuziBoard" class="board-grid liuzi-grid" aria-label="六子棋棋盘"></div>
+        </article>
+
+        <article class="game-panel" data-game-panel="connect4">
+          <div class="panel-head">
+            <div>
+              <p class="panel-tag">BOARD</p>
+              <h2>四子棋</h2>
+            </div>
+            <div class="panel-actions">
+              <button id="connect4RestartBtn" class="primary" type="button">重新开始</button>
+            </div>
+          </div>
+          <div class="mini-topbar">
+            <div class="stat"><span>轮到</span><strong id="connect4Turn">你</strong></div>
+            <div class="stat"><span>列数</span><strong>7 列</strong></div>
+            <div class="stat highlight"><span>目标</span><strong>四连</strong></div>
+          </div>
+          <p id="connect4Message" class="panel-message">先点上方列按钮，再看棋子落下。</p>
+          <div id="connect4Columns" class="column-controls" aria-label="四子棋列选择"></div>
+          <div id="connect4Board" class="board-grid connect4-grid" aria-label="四子棋棋盘"></div>
+        </article>
+
+        <article class="game-panel" data-game-panel="reversi">
+          <div class="panel-head">
+            <div>
+              <p class="panel-tag">BOARD</p>
+              <h2>黑白棋</h2>
+            </div>
+            <div class="panel-actions">
+              <button id="reversiRestartBtn" class="primary" type="button">重新开始</button>
+            </div>
+          </div>
+          <div class="mini-topbar">
+            <div class="stat"><span>黑子</span><strong id="reversiBlack">2</strong></div>
+            <div class="stat"><span>白子</span><strong id="reversiWhite">2</strong></div>
+            <div class="stat highlight"><span>轮到</span><strong id="reversiTurn">你</strong></div>
+          </div>
+          <p id="reversiMessage" class="panel-message">只可下在能翻动对方棋子的格子上。</p>
+          <div id="reversiBoard" class="board-grid reversi-grid" aria-label="黑白棋棋盘"></div>
+        </article>
+
+        <article class="game-panel" data-game-panel="checkers">
+          <div class="panel-head">
+            <div>
+              <p class="panel-tag">BOARD</p>
+              <h2>跳棋对战</h2>
+            </div>
+            <div class="panel-actions">
+              <button id="checkersRestartBtn" class="primary" type="button">重新开始</button>
+            </div>
+          </div>
+          <div class="mini-topbar">
+            <div class="stat"><span>你的棋子</span><strong id="checkersPlayerCount">8</strong></div>
+            <div class="stat"><span>电脑棋子</span><strong id="checkersAiCount">8</strong></div>
+            <div class="stat highlight"><span>轮到</span><strong id="checkersTurn">你</strong></div>
+          </div>
+          <p id="checkersMessage" class="panel-message">先点自己的棋子，再点高亮落点。能吃子时优先吃子。</p>
+          <div id="checkersBoard" class="board-grid checkers-grid" aria-label="跳棋棋盘"></div>
+        </article>
+
+        <article class="game-panel" data-game-panel="sudoku">
+          <div class="panel-head">
+            <div>
+              <p class="panel-tag">BOARD</p>
+              <h2>迷你数独</h2>
+            </div>
+            <div class="panel-actions">
+              <button id="sudokuRestartBtn" class="primary" type="button">换一题</button>
+            </div>
+          </div>
+          <div class="mini-topbar">
+            <div class="stat"><span>棋盘</span><strong>4 x 4</strong></div>
+            <div class="stat"><span>规则</span><strong>行列宫不重复</strong></div>
+            <div class="stat highlight"><span>完成度</span><strong id="sudokuProgress">0 / 16</strong></div>
+          </div>
+          <p id="sudokuMessage" class="panel-message">点击空格循环填写 1 到 4。</p>
+          <div id="sudokuBoard" class="board-grid sudoku-grid" aria-label="迷你数独棋盘"></div>
+        </article>
+
+        <article class="game-panel" data-game-panel="mines">
+          <div class="panel-head">
+            <div>
+              <p class="panel-tag">BOARD</p>
+              <h2>扫雷棋盘</h2>
+            </div>
+            <div class="panel-actions">
+              <button id="minesRestartBtn" class="primary" type="button">重新布雷</button>
+            </div>
+          </div>
+          <div class="mini-topbar">
+            <div class="stat"><span>剩余安全格</span><strong id="minesSafe">54</strong></div>
+            <div class="stat"><span>地雷数</span><strong>10</strong></div>
+            <div class="stat highlight"><span>状态</span><strong id="minesState">进行中</strong></div>
+          </div>
+          <p id="minesMessage" class="panel-message">点击格子翻开安全区域，踩到地雷就结束。</p>
+          <div id="minesBoard" class="board-grid mines-grid" aria-label="扫雷棋盘"></div>
+        </article>
+
+        <article class="game-panel" data-game-panel="hanoi">
+          <div class="panel-head">
+            <div>
+              <p class="panel-tag">BOARD</p>
+              <h2>汉诺塔</h2>
+            </div>
+            <div class="panel-actions">
+              <button id="hanoiRestartBtn" class="primary" type="button">重新开始</button>
+            </div>
+          </div>
+          <div class="mini-topbar">
+            <div class="stat"><span>步数</span><strong id="hanoiMoves">0</strong></div>
+            <div class="stat"><span>最优</span><strong>15</strong></div>
+            <div class="stat highlight"><span>选中</span><strong id="hanoiSelected">无</strong></div>
+          </div>
+          <p id="hanoiMessage" class="panel-message">先点柱子取盘，再点目标柱子放下。</p>
+          <div id="hanoiBoard" class="hanoi-board" aria-label="汉诺塔区域"></div>
+        </article>
+
+        <article class="game-panel" data-game-panel="lights">
+          <div class="panel-head">
+            <div>
+              <p class="panel-tag">BOARD</p>
+              <h2>熄灯棋</h2>
+            </div>
+            <div class="panel-actions">
+              <button id="lightsRestartBtn" class="primary" type="button">重新打乱</button>
+            </div>
+          </div>
+          <div class="mini-topbar">
+            <div class="stat"><span>步数</span><strong id="lightsMoves">0</strong></div>
+            <div class="stat"><span>棋盘</span><strong>5 x 5</strong></div>
+            <div class="stat highlight"><span>状态</span><strong id="lightsState">未完成</strong></div>
+          </div>
+          <p id="lightsMessage" class="panel-message">点击格子会切换自己和上下左右的灯。</p>
+          <div id="lightsBoard" class="board-grid lights-grid" aria-label="熄灯棋棋盘"></div>
+        </article>
+
+        <article class="game-panel" data-game-panel="hexpawn">
+          <div class="panel-head">
+            <div>
+              <p class="panel-tag">BOARD</p>
+              <h2>兵卒棋</h2>
+            </div>
+            <div class="panel-actions">
+              <button id="hexpawnRestartBtn" class="primary" type="button">重新开始</button>
+            </div>
+          </div>
+          <div class="mini-topbar">
+            <div class="stat"><span>你的兵</span><strong id="hexpawnPlayerCount">3</strong></div>
+            <div class="stat"><span>电脑兵</span><strong id="hexpawnAiCount">3</strong></div>
+            <div class="stat highlight"><span>轮到</span><strong id="hexpawnTurn">你</strong></div>
+          </div>
+          <p id="hexpawnMessage" class="panel-message">兵卒只能前进，斜向吃子，先冲到底线或吃光对手获胜。</p>
+          <div id="hexpawnBoard" class="board-grid hexpawn-grid" aria-label="兵卒棋棋盘"></div>
+        </article>
       </section>
     </main>
 

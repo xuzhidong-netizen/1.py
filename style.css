@@ -980,6 +980,172 @@ canvas {
   margin-top: 18px;
 }
 
+.board-grid,
+.column-controls {
+  display: grid;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.gomoku-grid {
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+}
+
+.liuzi-grid {
+  grid-template-columns: repeat(11, minmax(0, 1fr));
+}
+
+.connect4-grid,
+.reversi-grid,
+.checkers-grid,
+.mines-grid {
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+}
+
+.connect4-grid {
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+.sudoku-grid,
+.hanois-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.lights-grid {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.hexpawn-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.board-cell,
+.column-btn {
+  min-height: 44px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line-strong);
+  border-radius: 14px;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.04);
+  cursor: pointer;
+}
+
+.board-cell:hover,
+.column-btn:hover {
+  border-color: rgba(255, 209, 102, 0.4);
+}
+
+.board-cell.stone-black,
+.board-cell.stone-white,
+.board-cell.disc-black,
+.board-cell.disc-white,
+.board-cell.checker-red,
+.board-cell.checker-blue,
+.board-cell.pawn-player,
+.board-cell.pawn-ai {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.board-cell.stone-black,
+.board-cell.disc-black,
+.board-cell.pawn-player {
+  color: #111;
+}
+
+.board-cell.stone-white,
+.board-cell.disc-white {
+  color: #f8f8f8;
+}
+
+.board-cell.hint,
+.board-cell.playable,
+.board-cell.available {
+  box-shadow: inset 0 0 0 2px rgba(124, 231, 255, 0.35);
+}
+
+.board-cell.selected {
+  box-shadow: inset 0 0 0 2px rgba(255, 209, 102, 0.7);
+}
+
+.board-cell.dark {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.board-cell.fixed {
+  color: var(--gold);
+  cursor: default;
+  background: rgba(255, 209, 102, 0.08);
+}
+
+.board-cell.revealed {
+  cursor: default;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.board-cell.mine {
+  color: var(--red);
+  background: rgba(255, 109, 131, 0.18);
+}
+
+.board-cell.light-on {
+  color: #081321;
+  background: linear-gradient(135deg, #fff0a9, var(--gold));
+}
+
+.board-cell.light-off {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.column-controls {
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+.column-btn {
+  min-height: 40px;
+}
+
+.hanoi-board {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.hanoi-peg {
+  min-height: 240px;
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 10px 18px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  cursor: pointer;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(0, 0, 0, 0.08)),
+    rgba(255, 255, 255, 0.03);
+}
+
+.hanoi-peg.selected {
+  box-shadow: inset 0 0 0 2px rgba(255, 209, 102, 0.45);
+}
+
+.hanoi-pole {
+  width: 8px;
+  height: 110px;
+  margin-top: auto;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.hanoi-disc {
+  height: 18px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--gold), #fff0a9);
+}
+
 .ttt-cell {
   min-height: 120px;
   display: grid;
@@ -1370,6 +1536,39 @@ canvas {
   .memory-grid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 8px;
+  }
+
+  .gomoku-grid {
+    grid-template-columns: repeat(10, minmax(26px, 1fr));
+  }
+
+  .liuzi-grid {
+    grid-template-columns: repeat(11, minmax(24px, 1fr));
+  }
+
+  .connect4-grid,
+  .reversi-grid,
+  .checkers-grid,
+  .mines-grid,
+  .sudoku-grid,
+  .lights-grid {
+    gap: 6px;
+  }
+
+  .board-cell,
+  .column-btn {
+    min-height: 34px;
+    font-size: 0.92rem;
+    border-radius: 10px;
+  }
+
+  .hanoi-board {
+    gap: 8px;
+  }
+
+  .hanoi-peg {
+    min-height: 180px;
+    padding: 10px 6px 12px;
   }
 
   .memory-card {

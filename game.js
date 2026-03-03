@@ -1933,4 +1933,1132 @@ const breakoutGame = (() => {
 })();
 gameModules.breakout = breakoutGame;
 
+const boardDirs = [
+  [1, 0],
+  [0, 1],
+  [1, 1],
+  [1, -1],
+];
+
+function inBounds(size, row, col) {
+  return row >= 0 && row < size && col >= 0 && col < size;
+}
+
+function countLine(board, row, col, token, target, directions = boardDirs) {
+  return directions.some(([dr, dc]) => {
+    let total = 1;
+    for (const sign of [-1, 1]) {
+      let nextRow = row + dr * sign;
+      let nextCol = col + dc * sign;
+      while (
+        board[nextRow] &&
+        board[nextRow][nextCol] === token
+      ) {
+        total += 1;
+        nextRow += dr * sign;
+        nextCol += dc * sign;
+      }
+    }
+    return total >= target;
+  });
+}
+
+function randomFrom(items) {
+  return items[Math.floor(Math.random() * items.length)];
+}
+
+function createLineGame(options) {
+  const boardEl = document.getElementById(options.boardId);
+  const messageEl = document.getElementById(options.messageId);
+  const turnEl = document.getElementById(options.turnId);
+  const restartBtn = document.getElementById(options.restartId);
+  const size = options.size;
+  const need = options.need;
+  const state = {
+    active: currentGameId === options.id,
+    board: [],
+    over: false,
+    turn: "player",
+  };
+
+  function availableMoves() {
+    const moves = [];
+    for (let row = 0; row < size; row += 1) {
+      for (let col = 0; col < size; col += 1) {
+        if (!state.board[row][col]) {
+          moves.push([row, col]);
+        }
+      }
+    }
+    return moves;
+  }
+
+  function scoreMove(row, col, token) {
+    let score = 0;
+    for (const [dr, dc] of boardDirs) {
+      let total = 1;
+      for (const sign of [-1, 1]) {
+        let nextRow = row + dr * sign;
+        let nextCol = col + dc * sign;
+        while (state.board[nextRow] && state.board[nextRow][nextCol] === token) {
+          total += 1;
+          nextRow += dr * sign;
+          nextCol += dc * sign;
+        }
+      }
+      score = Math.max(score, total);
+    }
+    const center = Math.abs(row - size / 2) + Math.abs(col - size / 2);
+    return score * 20 - center;
+  }
+
+  function aiMove() {
+    if (state.over) return;
+    const moves = availableMoves();
+    if (!moves.length) {
+      state.over = true;
+      turnEl.textContent = "结束";
+      messageEl.textContent = "平局，棋盘已满。";
+      return;
+    }
+
+    let bestMove = moves[0];
+    let bestScore = -Infinity;
+    moves.forEach(([row, col]) => {
+      const attack = scoreMove(row, col, "O");
+      const defend = scoreMove(row, col, "X");
+      const total = attack >= need ? 999 : defend >= need ? 888 : attack * 2 + defend;
+      if (total > bestScore) {
+        bestScore = total;
+        bestMove = [row, col];
+      }
+    });
+
+    const [row, col] = bestMove;
+    state.board[row][col] = "O";
+    if (countLine(state.board, row, col, "O", need)) {
+      state.over = true;
+      turnEl.textContent = "结束";
+      messageEl.textContent = "电脑连线成功，这局你输了。";
+    } else if (!availableMoves().length) {
+      state.over = true;
+      turnEl.textContent = "结束";
+      messageEl.textContent = "平局，棋盘已满。";
+    } else {
+      state.turn = "player";
+      turnEl.textContent = "你";
+      messageEl.textContent = "轮到你了，继续找突破口。";
+    }
+    render();
+  }
+
+  function handleMove(row, col) {
+    if (!state.active || state.over || state.turn !== "player" || state.board[row][col]) return;
+    state.board[row][col] = "X";
+    if (countLine(state.board, row, col, "X", need)) {
+      state.over = true;
+      turnEl.textContent = "结束";
+      messageEl.textContent = "你赢了，这条线已经连成。";
+      render();
+      return;
+    }
+    state.turn = "ai";
+    turnEl.textContent = "电脑";
+    messageEl.textContent = "电脑正在找位置。";
+    render();
+    window.setTimeout(aiMove, 180);
+  }
+
+  function render() {
+    boardEl.innerHTML = "";
+    for (let row = 0; row < size; row += 1) {
+      for (let col = 0; col < size; col += 1) {
+        const cell = document.createElement("button");
+        cell.type = "button";
+        const value = state.board[row][col];
+        cell.className = `board-cell ${value === "X" ? "stone-black" : value === "O" ? "stone-white" : ""}`;
+        cell.textContent = value === "X" ? "●" : value === "O" ? "○" : "";
+        cell.addEventListener("click", () => handleMove(row, col));
+        boardEl.appendChild(cell);
+      }
+    }
+  }
+
+  function start() {
+    state.board = Array.from({ length: size }, () => Array(size).fill(""));
+    state.turn = "player";
+    state.over = false;
+    turnEl.textContent = "你";
+    messageEl.textContent = options.startText;
+    render();
+  }
+
+  restartBtn.addEventListener("click", start);
+  start();
+  state.start = start;
+  return state;
+}
+
+gameModules.gomoku = createLineGame({
+  id: "gomoku",
+  boardId: "gomokuBoard",
+  messageId: "gomokuMessage",
+  turnId: "gomokuTurn",
+  restartId: "gomokuRestartBtn",
+  size: 10,
+  need: 5,
+  startText: "你执黑先手，点击空格落子。",
+});
+
+gameModules.liuzi = createLineGame({
+  id: "liuzi",
+  boardId: "liuziBoard",
+  messageId: "liuziMessage",
+  turnId: "liuziTurn",
+  restartId: "liuziRestartBtn",
+  size: 11,
+  need: 6,
+  startText: "你执黑先手，连成六子即可获胜。",
+});
+
+const connect4Game = (() => {
+  const boardEl = document.getElementById("connect4Board");
+  const columnsEl = document.getElementById("connect4Columns");
+  const messageEl = document.getElementById("connect4Message");
+  const turnEl = document.getElementById("connect4Turn");
+  const restartBtn = document.getElementById("connect4RestartBtn");
+  const cols = 7;
+  const rows = 6;
+  const state = { active: currentGameId === "connect4", board: [], over: false, turn: "player" };
+
+  function resetBoard() {
+    state.board = Array.from({ length: rows }, () => Array(cols).fill(""));
+  }
+
+  function canDrop(col) {
+    return state.board[0][col] === "";
+  }
+
+  function drop(col, token) {
+    for (let row = rows - 1; row >= 0; row -= 1) {
+      if (!state.board[row][col]) {
+        state.board[row][col] = token;
+        return [row, col];
+      }
+    }
+    return null;
+  }
+
+  function lineWin(row, col, token) {
+    return countLine(state.board, row, col, token, 4);
+  }
+
+  function aiPlay() {
+    const validCols = Array.from({ length: cols }, (_, col) => col).filter(canDrop);
+    if (!validCols.length) {
+      state.over = true;
+      turnEl.textContent = "结束";
+      messageEl.textContent = "平局，棋盘满了。";
+      return;
+    }
+
+    let choice = validCols[0];
+    let bestScore = -Infinity;
+    validCols.forEach((col) => {
+      const probe = drop(col, "O");
+      const winNow = lineWin(probe[0], probe[1], "O");
+      state.board[probe[0]][probe[1]] = "";
+      const block = drop(col, "X");
+      const needBlock = lineWin(block[0], block[1], "X");
+      state.board[block[0]][block[1]] = "";
+      const score = winNow ? 999 : needBlock ? 888 : 20 - Math.abs(col - 3);
+      if (score > bestScore) {
+        bestScore = score;
+        choice = col;
+      }
+    });
+    const [row, col] = drop(choice, "O");
+    if (lineWin(row, col, "O")) {
+      state.over = true;
+      turnEl.textContent = "结束";
+      messageEl.textContent = "电脑先连成了四子。";
+    } else {
+      state.turn = "player";
+      turnEl.textContent = "你";
+      messageEl.textContent = "轮到你落子。";
+    }
+    render();
+  }
+
+  function handleDrop(col) {
+    if (!state.active || state.over || state.turn !== "player" || !canDrop(col)) return;
+    const [row, placedCol] = drop(col, "X");
+    if (lineWin(row, placedCol, "X")) {
+      state.over = true;
+      turnEl.textContent = "结束";
+      messageEl.textContent = "你连成四子，赢了。";
+      render();
+      return;
+    }
+    if (!Array.from({ length: cols }, (_, index) => index).some(canDrop)) {
+      state.over = true;
+      turnEl.textContent = "结束";
+      messageEl.textContent = "平局，棋盘满了。";
+      render();
+      return;
+    }
+    state.turn = "电脑";
+    turnEl.textContent = "电脑";
+    messageEl.textContent = "电脑正在落子。";
+    render();
+    window.setTimeout(aiPlay, 180);
+  }
+
+  function render() {
+    columnsEl.innerHTML = "";
+    for (let col = 0; col < cols; col += 1) {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "column-btn";
+      btn.textContent = `↓${col + 1}`;
+      btn.disabled = !canDrop(col) || state.over;
+      btn.addEventListener("click", () => handleDrop(col));
+      columnsEl.appendChild(btn);
+    }
+
+    boardEl.innerHTML = "";
+    for (let row = 0; row < rows; row += 1) {
+      for (let col = 0; col < cols; col += 1) {
+        const cell = document.createElement("div");
+        const value = state.board[row][col];
+        cell.className = `board-cell ${value === "X" ? "disc-black" : value === "O" ? "disc-white" : ""}`;
+        cell.textContent = value === "X" ? "●" : value === "O" ? "●" : "";
+        boardEl.appendChild(cell);
+      }
+    }
+  }
+
+  function start() {
+    resetBoard();
+    state.turn = "player";
+    state.over = false;
+    turnEl.textContent = "你";
+    messageEl.textContent = "先点上方列按钮，再看棋子落下。";
+    render();
+  }
+
+  restartBtn.addEventListener("click", start);
+  start();
+  state.start = start;
+  return state;
+})();
+gameModules.connect4 = connect4Game;
+
+const reversiGame = (() => {
+  const boardEl = document.getElementById("reversiBoard");
+  const blackEl = document.getElementById("reversiBlack");
+  const whiteEl = document.getElementById("reversiWhite");
+  const turnEl = document.getElementById("reversiTurn");
+  const messageEl = document.getElementById("reversiMessage");
+  const restartBtn = document.getElementById("reversiRestartBtn");
+  const size = 8;
+  const dirs = [-1, 0, 1].flatMap((dr) => [-1, 0, 1].map((dc) => [dr, dc])).filter(([dr, dc]) => dr || dc);
+  const state = { active: currentGameId === "reversi", board: [], over: false, turn: "B" };
+
+  function getFlips(row, col, token) {
+    if (state.board[row][col]) return [];
+    const enemy = token === "B" ? "W" : "B";
+    const flips = [];
+    dirs.forEach(([dr, dc]) => {
+      const line = [];
+      let nextRow = row + dr;
+      let nextCol = col + dc;
+      while (inBounds(size, nextRow, nextCol) && state.board[nextRow][nextCol] === enemy) {
+        line.push([nextRow, nextCol]);
+        nextRow += dr;
+        nextCol += dc;
+      }
+      if (line.length && inBounds(size, nextRow, nextCol) && state.board[nextRow][nextCol] === token) {
+        flips.push(...line);
+      }
+    });
+    return flips;
+  }
+
+  function legalMoves(token) {
+    const result = [];
+    for (let row = 0; row < size; row += 1) {
+      for (let col = 0; col < size; col += 1) {
+        const flips = getFlips(row, col, token);
+        if (flips.length) result.push({ row, col, flips });
+      }
+    }
+    return result;
+  }
+
+  function updateCounts() {
+    let black = 0;
+    let white = 0;
+    state.board.forEach((line) => line.forEach((cell) => {
+      if (cell === "B") black += 1;
+      if (cell === "W") white += 1;
+    }));
+    blackEl.textContent = String(black);
+    whiteEl.textContent = String(white);
+  }
+
+  function finish() {
+    state.over = true;
+    updateCounts();
+    const black = Number(blackEl.textContent);
+    const white = Number(whiteEl.textContent);
+    turnEl.textContent = "结束";
+    if (black > white) messageEl.textContent = "黑子更多，你赢了。";
+    else if (white > black) messageEl.textContent = "白子更多，电脑赢了。";
+    else messageEl.textContent = "双方平分秋色，平局。";
+    render();
+  }
+
+  function nextTurn() {
+    const playerMoves = legalMoves("B");
+    const aiMoves = legalMoves("W");
+    if (!playerMoves.length && !aiMoves.length) {
+      finish();
+      return;
+    }
+    if (state.turn === "W" && !aiMoves.length) {
+      state.turn = "B";
+      turnEl.textContent = "你";
+      messageEl.textContent = "电脑无子可下，继续由你落子。";
+      render();
+      return;
+    }
+    if (state.turn === "B" && !playerMoves.length) {
+      state.turn = "W";
+      turnEl.textContent = "电脑";
+      messageEl.textContent = "你无子可下，电脑继续。";
+      render();
+      window.setTimeout(aiMove, 220);
+      return;
+    }
+    turnEl.textContent = state.turn === "B" ? "你" : "电脑";
+    render();
+    if (state.turn === "W") {
+      window.setTimeout(aiMove, 220);
+    }
+  }
+
+  function makeMove(row, col, token) {
+    const flips = getFlips(row, col, token);
+    if (!flips.length) return false;
+    state.board[row][col] = token;
+    flips.forEach(([flipRow, flipCol]) => {
+      state.board[flipRow][flipCol] = token;
+    });
+    updateCounts();
+    return true;
+  }
+
+  function aiMove() {
+    if (!state.active || state.over || state.turn !== "W") return;
+    const moves = legalMoves("W");
+    if (!moves.length) {
+      state.turn = "B";
+      nextTurn();
+      return;
+    }
+    moves.sort((left, right) => right.flips.length - left.flips.length);
+    const move = moves[0];
+    makeMove(move.row, move.col, "W");
+    state.turn = "B";
+    messageEl.textContent = "轮到你了，找能翻子的格。";
+    nextTurn();
+  }
+
+  function handleClick(row, col) {
+    if (!state.active || state.over || state.turn !== "B") return;
+    if (!makeMove(row, col, "B")) return;
+    state.turn = "W";
+    messageEl.textContent = "电脑正在思考落点。";
+    nextTurn();
+  }
+
+  function render() {
+    const legal = new Set(legalMoves(state.turn).map((item) => `${item.row}-${item.col}`));
+    boardEl.innerHTML = "";
+    for (let row = 0; row < size; row += 1) {
+      for (let col = 0; col < size; col += 1) {
+        const cell = document.createElement("button");
+        cell.type = "button";
+        const value = state.board[row][col];
+        const key = `${row}-${col}`;
+        cell.className = `board-cell ${
+          value === "B" ? "disc-black" : value === "W" ? "disc-white" : legal.has(key) ? "playable" : ""
+        }`;
+        cell.textContent = value === "B" || value === "W" ? "●" : legal.has(key) ? "·" : "";
+        cell.addEventListener("click", () => handleClick(row, col));
+        boardEl.appendChild(cell);
+      }
+    }
+  }
+
+  function start() {
+    state.board = Array.from({ length: size }, () => Array(size).fill(""));
+    state.board[3][3] = "W";
+    state.board[3][4] = "B";
+    state.board[4][3] = "B";
+    state.board[4][4] = "W";
+    state.turn = "B";
+    state.over = false;
+    turnEl.textContent = "你";
+    messageEl.textContent = "只可下在能翻动对方棋子的格子上。";
+    updateCounts();
+    render();
+  }
+
+  restartBtn.addEventListener("click", start);
+  start();
+  state.start = start;
+  return state;
+})();
+gameModules.reversi = reversiGame;
+
+const checkersGame = (() => {
+  const boardEl = document.getElementById("checkersBoard");
+  const playerCountEl = document.getElementById("checkersPlayerCount");
+  const aiCountEl = document.getElementById("checkersAiCount");
+  const turnEl = document.getElementById("checkersTurn");
+  const messageEl = document.getElementById("checkersMessage");
+  const restartBtn = document.getElementById("checkersRestartBtn");
+  const size = 8;
+  const state = { active: currentGameId === "checkers", board: [], selected: null, turn: "P", over: false };
+
+  function inside(row, col) {
+    return row >= 0 && row < size && col >= 0 && col < size;
+  }
+
+  function countPieces() {
+    let player = 0;
+    let ai = 0;
+    state.board.forEach((line) => line.forEach((cell) => {
+      if (cell === "P") player += 1;
+      if (cell === "A") ai += 1;
+    }));
+    playerCountEl.textContent = String(player);
+    aiCountEl.textContent = String(ai);
+    return { player, ai };
+  }
+
+  function movesFor(row, col, token) {
+    const enemy = token === "P" ? "A" : "P";
+    const dir = token === "P" ? -1 : 1;
+    const options = [];
+    [[dir, -1], [dir, 1]].forEach(([dr, dc]) => {
+      const nextRow = row + dr;
+      const nextCol = col + dc;
+      if (!inside(nextRow, nextCol)) return;
+      if (!state.board[nextRow][nextCol]) {
+        options.push({ row: nextRow, col: nextCol, capture: null });
+      } else if (state.board[nextRow][nextCol] === enemy) {
+        const jumpRow = nextRow + dr;
+        const jumpCol = nextCol + dc;
+        if (inside(jumpRow, jumpCol) && !state.board[jumpRow][jumpCol]) {
+          options.push({ row: jumpRow, col: jumpCol, capture: [nextRow, nextCol] });
+        }
+      }
+    });
+    return options;
+  }
+
+  function allMoves(token) {
+    const moves = [];
+    state.board.forEach((line, row) => line.forEach((cell, col) => {
+      if (cell === token) {
+        movesFor(row, col, token).forEach((move) => moves.push({ from: [row, col], ...move }));
+      }
+    }));
+    const captures = moves.filter((move) => move.capture);
+    return captures.length ? captures : moves;
+  }
+
+  function finish(message) {
+    state.over = true;
+    turnEl.textContent = "结束";
+    messageEl.textContent = message;
+    render();
+  }
+
+  function aiTurn() {
+    const moves = allMoves("A");
+    if (!moves.length) {
+      finish("电脑无路可走，你赢了。");
+      return;
+    }
+    const move = randomFrom(moves);
+    const [fromRow, fromCol] = move.from;
+    state.board[fromRow][fromCol] = "";
+    state.board[move.row][move.col] = "A";
+    if (move.capture) {
+      state.board[move.capture[0]][move.capture[1]] = "";
+    }
+    const counts = countPieces();
+    if (!counts.player) {
+      finish("你的棋子被清空了。");
+      return;
+    }
+    state.turn = "P";
+    turnEl.textContent = "你";
+    messageEl.textContent = "轮到你走子。";
+    render();
+  }
+
+  function handleClick(row, col) {
+    if (!state.active || state.over || state.turn !== "P") return;
+    const forced = allMoves("P");
+    const forcedTargets = new Map(forced.map((move) => [`${move.from[0]}-${move.from[1]}`, true]));
+    if (state.board[row][col] === "P") {
+      if (forcedTargets.size && !forcedTargets.has(`${row}-${col}`)) {
+        messageEl.textContent = "当前有吃子机会，需优先吃子。";
+        return;
+      }
+      state.selected = [row, col];
+      render();
+      return;
+    }
+    if (!state.selected) return;
+    const [fromRow, fromCol] = state.selected;
+    const legal = movesFor(fromRow, fromCol, "P");
+    const mustCapture = forced.some((move) => move.capture);
+    const move = legal.find((item) => item.row === row && item.col === col && (!mustCapture || item.capture));
+    if (!move) return;
+    state.board[fromRow][fromCol] = "";
+    state.board[row][col] = "P";
+    if (move.capture) {
+      state.board[move.capture[0]][move.capture[1]] = "";
+    }
+    state.selected = null;
+    const counts = countPieces();
+    if (!counts.ai) {
+      finish("你吃光了电脑的棋子。");
+      return;
+    }
+    if (!allMoves("A").length) {
+      finish("电脑无路可走，你赢了。");
+      return;
+    }
+    state.turn = "A";
+    turnEl.textContent = "电脑";
+    messageEl.textContent = "电脑正在走子。";
+    render();
+    window.setTimeout(aiTurn, 200);
+  }
+
+  function render() {
+    const legalTargets = new Set();
+    if (state.selected) {
+      const forced = allMoves("P");
+      const mustCapture = forced.some((move) => move.capture);
+      movesFor(state.selected[0], state.selected[1], "P")
+        .filter((move) => !mustCapture || move.capture)
+        .forEach((move) => legalTargets.add(`${move.row}-${move.col}`));
+    }
+    boardEl.innerHTML = "";
+    for (let row = 0; row < size; row += 1) {
+      for (let col = 0; col < size; col += 1) {
+        const cell = document.createElement("button");
+        cell.type = "button";
+        const dark = (row + col) % 2 === 1;
+        const value = state.board[row][col];
+        const selected = state.selected && state.selected[0] === row && state.selected[1] === col;
+        cell.className = `board-cell ${dark ? "dark" : ""} ${
+          value === "P" ? "checker-red" : value === "A" ? "checker-blue" : ""
+        } ${selected ? "selected" : ""} ${legalTargets.has(`${row}-${col}`) ? "available" : ""}`;
+        cell.textContent = value === "P" ? "●" : value === "A" ? "●" : "";
+        cell.addEventListener("click", () => handleClick(row, col));
+        boardEl.appendChild(cell);
+      }
+    }
+  }
+
+  function start() {
+    state.board = Array.from({ length: size }, () => Array(size).fill(""));
+    for (let row = 0; row < 2; row += 1) {
+      for (let col = 0; col < size; col += 1) {
+        if ((row + col) % 2 === 1) state.board[row][col] = "A";
+      }
+    }
+    for (let row = 6; row < 8; row += 1) {
+      for (let col = 0; col < size; col += 1) {
+        if ((row + col) % 2 === 1) state.board[row][col] = "P";
+      }
+    }
+    state.selected = null;
+    state.turn = "P";
+    state.over = false;
+    turnEl.textContent = "你";
+    messageEl.textContent = "先点自己的棋子，再点高亮落点。能吃子时优先吃子。";
+    countPieces();
+    render();
+  }
+
+  restartBtn.addEventListener("click", start);
+  start();
+  state.start = start;
+  return state;
+})();
+gameModules.checkers = checkersGame;
+
+const sudokuGame = (() => {
+  const boardEl = document.getElementById("sudokuBoard");
+  const progressEl = document.getElementById("sudokuProgress");
+  const messageEl = document.getElementById("sudokuMessage");
+  const restartBtn = document.getElementById("sudokuRestartBtn");
+  const puzzle = [
+    [1, 0, 0, 4],
+    [0, 4, 1, 0],
+    [2, 0, 4, 0],
+    [0, 3, 0, 1],
+  ];
+  const solution = [
+    [1, 2, 3, 4],
+    [3, 4, 1, 2],
+    [2, 1, 4, 3],
+    [4, 3, 2, 1],
+  ];
+  const state = { active: currentGameId === "sudoku", board: [] };
+
+  function updateProgress() {
+    const filled = state.board.flat().filter(Boolean).length;
+    progressEl.textContent = `${filled} / 16`;
+    if (filled === 16) {
+      const ok = state.board.every((line, row) => line.every((value, col) => value === solution[row][col]));
+      messageEl.textContent = ok ? "完成了，这题数独解对了。" : "棋盘已填满，但还有数字不对。";
+    }
+  }
+
+  function render() {
+    boardEl.innerHTML = "";
+    state.board.forEach((line, row) => line.forEach((value, col) => {
+      const fixed = puzzle[row][col] !== 0;
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = `board-cell ${fixed ? "fixed" : ""}`;
+      btn.textContent = value ? String(value) : "";
+      if (!fixed) {
+        btn.addEventListener("click", () => {
+          state.board[row][col] = state.board[row][col] >= 4 ? 0 : state.board[row][col] + 1;
+          render();
+          updateProgress();
+        });
+      }
+      boardEl.appendChild(btn);
+    }));
+  }
+
+  function start() {
+    state.board = puzzle.map((line) => [...line]);
+    messageEl.textContent = "点击空格循环填写 1 到 4。";
+    render();
+    updateProgress();
+  }
+
+  restartBtn.addEventListener("click", start);
+  start();
+  state.start = start;
+  return state;
+})();
+gameModules.sudoku = sudokuGame;
+
+const minesGame = (() => {
+  const boardEl = document.getElementById("minesBoard");
+  const safeEl = document.getElementById("minesSafe");
+  const stateEl = document.getElementById("minesState");
+  const messageEl = document.getElementById("minesMessage");
+  const restartBtn = document.getElementById("minesRestartBtn");
+  const size = 8;
+  const mineCount = 10;
+  const state = { active: currentGameId === "mines", board: [], over: false, safeLeft: 54 };
+
+  function countAround(row, col) {
+    let count = 0;
+    for (let dr = -1; dr <= 1; dr += 1) {
+      for (let dc = -1; dc <= 1; dc += 1) {
+        if (!dr && !dc) continue;
+        const nextRow = row + dr;
+        const nextCol = col + dc;
+        if (inBounds(size, nextRow, nextCol) && state.board[nextRow][nextCol].mine) count += 1;
+      }
+    }
+    return count;
+  }
+
+  function reveal(row, col) {
+    const cell = state.board[row][col];
+    if (cell.revealed || state.over) return;
+    cell.revealed = true;
+    if (cell.mine) {
+      state.over = true;
+      stateEl.textContent = "失败";
+      messageEl.textContent = "踩到地雷了，重新布雷再试。";
+      state.board.flat().forEach((item) => {
+        if (item.mine) item.revealed = true;
+      });
+      render();
+      return;
+    }
+    state.safeLeft -= 1;
+    if (cell.count === 0) {
+      for (let dr = -1; dr <= 1; dr += 1) {
+        for (let dc = -1; dc <= 1; dc += 1) {
+          const nextRow = row + dr;
+          const nextCol = col + dc;
+          if (inBounds(size, nextRow, nextCol)) {
+            reveal(nextRow, nextCol);
+          }
+        }
+      }
+    }
+    if (state.safeLeft === 0) {
+      state.over = true;
+      stateEl.textContent = "通关";
+      messageEl.textContent = "你把所有安全格都翻开了。";
+    }
+  }
+
+  function render() {
+    safeEl.textContent = String(state.safeLeft);
+    boardEl.innerHTML = "";
+    state.board.forEach((line, row) => line.forEach((cell, col) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = `board-cell ${cell.revealed ? "revealed" : ""} ${cell.mine && cell.revealed ? "mine" : ""}`;
+      btn.textContent = !cell.revealed ? "" : cell.mine ? "✹" : cell.count || "";
+      btn.addEventListener("click", () => {
+        reveal(row, col);
+        render();
+      });
+      boardEl.appendChild(btn);
+    }));
+  }
+
+  function start() {
+    state.board = Array.from({ length: size }, () =>
+      Array.from({ length: size }, () => ({ mine: false, revealed: false, count: 0 }))
+    );
+    const positions = [];
+    while (positions.length < mineCount) {
+      const row = Math.floor(Math.random() * size);
+      const col = Math.floor(Math.random() * size);
+      const key = `${row}-${col}`;
+      if (!positions.includes(key)) {
+        positions.push(key);
+        state.board[row][col].mine = true;
+      }
+    }
+    state.board.forEach((line, row) => line.forEach((cell, col) => {
+      cell.count = cell.mine ? -1 : countAround(row, col);
+    }));
+    state.safeLeft = size * size - mineCount;
+    state.over = false;
+    stateEl.textContent = "进行中";
+    messageEl.textContent = "点击格子翻开安全区域，踩到地雷就结束。";
+    render();
+  }
+
+  restartBtn.addEventListener("click", start);
+  start();
+  state.start = start;
+  return state;
+})();
+gameModules.mines = minesGame;
+
+const hanoiGame = (() => {
+  const boardEl = document.getElementById("hanoiBoard");
+  const movesEl = document.getElementById("hanoiMoves");
+  const selectedEl = document.getElementById("hanoiSelected");
+  const messageEl = document.getElementById("hanoiMessage");
+  const restartBtn = document.getElementById("hanoiRestartBtn");
+  const state = { active: currentGameId === "hanoi", pegs: [], selected: null, moves: 0 };
+
+  function render() {
+    movesEl.textContent = String(state.moves);
+    selectedEl.textContent = state.selected === null ? "无" : `第 ${state.selected + 1} 柱`;
+    boardEl.innerHTML = "";
+    state.pegs.forEach((peg, pegIndex) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = `hanoi-peg ${state.selected === pegIndex ? "selected" : ""}`;
+      btn.addEventListener("click", () => handlePeg(pegIndex));
+      peg.forEach((disc) => {
+        const discEl = document.createElement("div");
+        discEl.className = "hanoi-disc";
+        discEl.style.width = `${28 + disc * 18}px`;
+        btn.appendChild(discEl);
+      });
+      const pole = document.createElement("div");
+      pole.className = "hanoi-pole";
+      btn.appendChild(pole);
+      boardEl.appendChild(btn);
+    });
+  }
+
+  function handlePeg(index) {
+    if (!state.active) return;
+    if (state.selected === null) {
+      if (!state.pegs[index].length) return;
+      state.selected = index;
+      messageEl.textContent = "已取起圆盘，请选择目标柱子。";
+      render();
+      return;
+    }
+    if (state.selected === index) {
+      state.selected = null;
+      messageEl.textContent = "已取消选择。";
+      render();
+      return;
+    }
+    const fromPeg = state.pegs[state.selected];
+    const toPeg = state.pegs[index];
+    const disc = fromPeg[fromPeg.length - 1];
+    const top = toPeg[toPeg.length - 1];
+    if (top && top < disc) {
+      messageEl.textContent = "大盘不能压在小盘上。";
+      state.selected = null;
+      render();
+      return;
+    }
+    fromPeg.pop();
+    toPeg.push(disc);
+    state.moves += 1;
+    state.selected = null;
+    if (state.pegs[2].length === 4) {
+      messageEl.textContent = "你已经把全部圆盘移到终点柱。";
+    } else {
+      messageEl.textContent = "继续移动，目标是把所有圆盘搬到第三柱。";
+    }
+    render();
+  }
+
+  function start() {
+    state.pegs = [[4, 3, 2, 1], [], []];
+    state.selected = null;
+    state.moves = 0;
+    messageEl.textContent = "先点柱子取盘，再点目标柱子放下。";
+    render();
+  }
+
+  restartBtn.addEventListener("click", start);
+  start();
+  state.start = start;
+  return state;
+})();
+gameModules.hanoi = hanoiGame;
+
+const lightsGame = (() => {
+  const boardEl = document.getElementById("lightsBoard");
+  const movesEl = document.getElementById("lightsMoves");
+  const stateEl = document.getElementById("lightsState");
+  const messageEl = document.getElementById("lightsMessage");
+  const restartBtn = document.getElementById("lightsRestartBtn");
+  const size = 5;
+  const state = { active: currentGameId === "lights", board: [], moves: 0, over: false };
+
+  function toggle(row, col) {
+    if (!inBounds(size, row, col)) return;
+    state.board[row][col] = !state.board[row][col];
+  }
+
+  function handleClick(row, col) {
+    if (!state.active || state.over) return;
+    [[0, 0], [1, 0], [-1, 0], [0, 1], [0, -1]].forEach(([dr, dc]) => toggle(row + dr, col + dc));
+    state.moves += 1;
+    if (state.board.flat().every((item) => !item)) {
+      state.over = true;
+      stateEl.textContent = "完成";
+      messageEl.textContent = "全盘都熄灭了。";
+    }
+    render();
+  }
+
+  function render() {
+    movesEl.textContent = String(state.moves);
+    boardEl.innerHTML = "";
+    state.board.forEach((line, row) => line.forEach((value, col) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = `board-cell ${value ? "light-on" : "light-off"}`;
+      btn.textContent = value ? "✦" : "";
+      btn.addEventListener("click", () => handleClick(row, col));
+      boardEl.appendChild(btn);
+    }));
+  }
+
+  function start() {
+    state.board = Array.from({ length: size }, () => Array.from({ length: size }, () => Math.random() > 0.55));
+    state.moves = 0;
+    state.over = false;
+    stateEl.textContent = "未完成";
+    messageEl.textContent = "点击格子会切换自己和上下左右的灯。";
+    render();
+  }
+
+  restartBtn.addEventListener("click", start);
+  start();
+  state.start = start;
+  return state;
+})();
+gameModules.lights = lightsGame;
+
+const hexpawnGame = (() => {
+  const boardEl = document.getElementById("hexpawnBoard");
+  const playerCountEl = document.getElementById("hexpawnPlayerCount");
+  const aiCountEl = document.getElementById("hexpawnAiCount");
+  const turnEl = document.getElementById("hexpawnTurn");
+  const messageEl = document.getElementById("hexpawnMessage");
+  const restartBtn = document.getElementById("hexpawnRestartBtn");
+  const size = 3;
+  const state = { active: currentGameId === "hexpawn", board: [], selected: null, turn: "P", over: false };
+
+  function countPieces() {
+    let player = 0;
+    let ai = 0;
+    state.board.flat().forEach((cell) => {
+      if (cell === "P") player += 1;
+      if (cell === "A") ai += 1;
+    });
+    playerCountEl.textContent = String(player);
+    aiCountEl.textContent = String(ai);
+    return { player, ai };
+  }
+
+  function legalMoves(token) {
+    const dir = token === "P" ? -1 : 1;
+    const enemy = token === "P" ? "A" : "P";
+    const moves = [];
+    state.board.forEach((line, row) => line.forEach((cell, col) => {
+      if (cell !== token) return;
+      const nextRow = row + dir;
+      if (!inBounds(size, nextRow, col)) return;
+      if (!state.board[nextRow][col]) {
+        moves.push({ from: [row, col], to: [nextRow, col] });
+      }
+      [-1, 1].forEach((dc) => {
+        const nextCol = col + dc;
+        if (inBounds(size, nextRow, nextCol) && state.board[nextRow][nextCol] === enemy) {
+          moves.push({ from: [row, col], to: [nextRow, nextCol], capture: true });
+        }
+      });
+    }));
+    return moves;
+  }
+
+  function winCheck() {
+    const counts = countPieces();
+    if (!counts.ai) return "你吃光了电脑兵卒。";
+    if (!counts.player) return "你的兵卒被吃光了。";
+    if (state.board[0].includes("P")) return "你的兵卒冲到底线，赢了。";
+    if (state.board[2].includes("A")) return "电脑兵卒冲到底线了。";
+    if (!legalMoves("P").length) return "你已经无路可走。";
+    if (!legalMoves("A").length) return "电脑无路可走，你赢了。";
+    return "";
+  }
+
+  function aiTurn() {
+    const moves = legalMoves("A");
+    if (!moves.length) {
+      state.over = true;
+      turnEl.textContent = "结束";
+      messageEl.textContent = "电脑无路可走，你赢了。";
+      render();
+      return;
+    }
+    const captures = moves.filter((move) => move.capture);
+    const move = randomFrom(captures.length ? captures : moves);
+    state.board[move.from[0]][move.from[1]] = "";
+    state.board[move.to[0]][move.to[1]] = "A";
+    const outcome = winCheck();
+    if (outcome) {
+      state.over = true;
+      turnEl.textContent = "结束";
+      messageEl.textContent = outcome;
+    } else {
+      state.turn = "P";
+      turnEl.textContent = "你";
+      messageEl.textContent = "轮到你推进兵卒。";
+    }
+    render();
+  }
+
+  function handleClick(row, col) {
+    if (!state.active || state.over || state.turn !== "P") return;
+    if (state.board[row][col] === "P") {
+      state.selected = [row, col];
+      render();
+      return;
+    }
+    if (!state.selected) return;
+    const moves = legalMoves("P").filter((move) => move.from[0] === state.selected[0] && move.from[1] === state.selected[1]);
+    const chosen = moves.find((move) => move.to[0] === row && move.to[1] === col);
+    if (!chosen) return;
+    state.board[chosen.from[0]][chosen.from[1]] = "";
+    state.board[chosen.to[0]][chosen.to[1]] = "P";
+    state.selected = null;
+    const outcome = winCheck();
+    if (outcome) {
+      state.over = true;
+      turnEl.textContent = "结束";
+      messageEl.textContent = outcome;
+      render();
+      return;
+    }
+    state.turn = "A";
+    turnEl.textContent = "电脑";
+    messageEl.textContent = "电脑正在推进兵卒。";
+    render();
+    window.setTimeout(aiTurn, 180);
+  }
+
+  function render() {
+    const legal = new Set();
+    if (state.selected) {
+      legalMoves("P")
+        .filter((move) => move.from[0] === state.selected[0] && move.from[1] === state.selected[1])
+        .forEach((move) => legal.add(`${move.to[0]}-${move.to[1]}`));
+    }
+    boardEl.innerHTML = "";
+    state.board.forEach((line, row) => line.forEach((value, col) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      const selected = state.selected && state.selected[0] === row && state.selected[1] === col;
+      btn.className = `board-cell ${
+        value === "P" ? "pawn-player" : value === "A" ? "pawn-ai" : ""
+      } ${selected ? "selected" : ""} ${legal.has(`${row}-${col}`) ? "available" : ""}`;
+      btn.textContent = value === "P" ? "♟" : value === "A" ? "♙" : "";
+      btn.addEventListener("click", () => handleClick(row, col));
+      boardEl.appendChild(btn);
+    }));
+  }
+
+  function start() {
+    state.board = [
+      ["A", "A", "A"],
+      ["", "", ""],
+      ["P", "P", "P"],
+    ];
+    state.selected = null;
+    state.turn = "P";
+    state.over = false;
+    turnEl.textContent = "你";
+    messageEl.textContent = "兵卒只能前进，斜向吃子，先冲到底线或吃光对手获胜。";
+    countPieces();
+    render();
+  }
+
+  restartBtn.addEventListener("click", start);
+  start();
+  state.start = start;
+  return state;
+})();
+gameModules.hexpawn = hexpawnGame;
+
 switchGame(currentGameId);
