@@ -1,5 +1,4 @@
 const gamePanels = document.querySelectorAll("[data-game-panel]");
-const gameLinks = document.querySelectorAll("[data-game-link]");
 const quickStartBtn = document.getElementById("quickStartBtn");
 const randomGameBtn = document.getElementById("randomGameBtn");
 const backToHomeBtn = document.getElementById("backToHomeBtn");
@@ -8,85 +7,111 @@ const playDescriptionEl = document.getElementById("playDescription");
 const playGenreEl = document.getElementById("playGenre");
 const playDifficultyEl = document.getElementById("playDifficulty");
 const playDurationEl = document.getElementById("playDuration");
+const playNavEl = document.getElementById("playNav");
+const recentPlayListEl = document.getElementById("recentPlayList");
+const playHotTagsEl = document.getElementById("playHotTags");
 
 const gameModules = {};
 const params = new URLSearchParams(window.location.search);
+const catalogEntries = Array.isArray(window.arcadeCatalog?.games) ? window.arcadeCatalog.games : [];
+const catalog = Object.fromEntries(catalogEntries.map((game) => [game.id, game]));
+const orderedGameIds = catalogEntries.map((game) => game.id);
+const recentGamesKey = "arcade-recent-games";
+let currentGameId = orderedGameIds.includes(params.get("game")) ? params.get("game") : orderedGameIds[0] || "star";
+let gameLinks = [];
 
-const catalog = {
-  star: {
-    title: "星落接接乐",
-    description: "接住星星、躲开炸弹，60 秒冲分。",
-    genre: "动作反应",
-    difficulty: "简单上手",
-    duration: "1 分钟",
-  },
-  ddz: {
-    title: "斗地主小游戏",
-    description: "单机快速局，和两个 AI 对战。",
-    genre: "牌类策略",
-    difficulty: "中等",
-    duration: "3-5 分钟",
-  },
-  ttt: {
-    title: "井字棋",
-    description: "经典三连线，适合快速来一局。",
-    genre: "轻策略",
-    difficulty: "简单",
-    duration: "30 秒",
-  },
-  memory: {
-    title: "记忆翻牌",
-    description: "翻开相同图案完成配对。",
-    genre: "记忆益智",
-    difficulty: "中等",
-    duration: "2 分钟",
-  },
-  mole: {
-    title: "打地鼠",
-    description: "30 秒快打模式，拼手速和眼力。",
-    genre: "极限反应",
-    difficulty: "刺激",
-    duration: "30 秒",
-  },
-  snake: {
-    title: "贪吃蛇",
-    description: "吃豆变长，撞墙或撞自己就结束。",
-    genre: "经典街机",
-    difficulty: "中等",
-    duration: "2-4 分钟",
-  },
-  "2048": {
-    title: "2048",
-    description: "滑动数字方块，合成更大的数字。",
-    genre: "数字益智",
-    difficulty: "耐玩",
-    duration: "3-8 分钟",
-  },
-  rps: {
-    title: "石头剪刀布",
-    description: "三局两胜也行，连续挑战也行。",
-    genre: "休闲对抗",
-    difficulty: "轻松",
-    duration: "10 秒",
-  },
-  reaction: {
-    title: "反应速度测试",
-    description: "等信号变绿后立刻点击，测你的真实反应。",
-    genre: "测试挑战",
-    difficulty: "极简",
-    duration: "15 秒",
-  },
-  breakout: {
-    title: "打砖块",
-    description: "接住小球，清光砖块就过关。",
-    genre: "经典街机",
-    difficulty: "中等偏上",
-    duration: "2-5 分钟",
-  },
-};
+function readRecentGames() {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(recentGamesKey) || "[]");
+    return Array.isArray(parsed) ? parsed.filter((id) => orderedGameIds.includes(id)) : [];
+  } catch (error) {
+    return [];
+  }
+}
 
-const orderedGameIds = Object.keys(catalog);
-let currentGameId = orderedGameIds.includes(params.get("game")) ? params.get("game") : "star";
+function writeRecentGames(gameId) {
+  const next = [gameId, ...readRecentGames().filter((id) => id !== gameId)].slice(0, 4);
+  localStorage.setItem(recentGamesKey, JSON.stringify(next));
+  return next;
+}
+
+function renderHotTags() {
+  const tagCounter = new Map();
+  catalogEntries
+    .filter((game) => game.hotRank <= 5)
+    .forEach((game) => {
+      game.tags.forEach((tag) => {
+        tagCounter.set(tag, (tagCounter.get(tag) || 0) + 1);
+      });
+    });
+
+  const tags = [...tagCounter.entries()]
+    .sort((left, right) => right[1] - left[1])
+    .slice(0, 6)
+    .map(([tag]) => `<span class="tag-chip">${tag}</span>`)
+    .join("");
+
+  playHotTagsEl.innerHTML = tags || `<span class="sidebar-empty">暂无热门标签</span>`;
+}
+
+function renderRecentPlay() {
+  const recentGames = readRecentGames();
+  if (!recentGames.length) {
+    recentPlayListEl.innerHTML = `<p class="sidebar-empty">还没有最近游玩，先开一局。</p>`;
+    return;
+  }
+
+  recentPlayListEl.innerHTML = recentGames
+    .map((gameId, index) => {
+      const info = catalog[gameId];
+      return `
+        <button class="recent-link" type="button" data-recent-game="${gameId}">
+          <span class="recent-link-rank">${index + 1}</span>
+          <span class="recent-link-copy">
+            <strong>${info.title}</strong>
+            <span>${info.genre}</span>
+          </span>
+        </button>
+      `;
+    })
+    .join("");
+
+  recentPlayListEl.querySelectorAll("[data-recent-game]").forEach((button) => {
+    button.addEventListener("click", () => switchGame(button.dataset.recentGame));
+  });
+}
+
+function renderPlayNav() {
+  const recentGames = readRecentGames();
+  playNavEl.innerHTML = orderedGameIds
+    .map((gameId) => {
+      const info = catalog[gameId];
+      const badges = [];
+      if (info.hotRank <= 3) {
+        badges.push(`<span class="nav-badge hot">TOP ${info.hotRank}</span>`);
+      }
+      if (recentGames.includes(gameId)) {
+        badges.push(`<span class="nav-badge recent">最近玩</span>`);
+      }
+
+      return `
+        <button class="play-nav-link" type="button" data-game-link="${gameId}">
+          <span class="play-nav-icon">${info.icon}</span>
+          <span class="play-nav-copy">
+            <strong>${info.title}</strong>
+            <span>${info.genre}</span>
+          </span>
+          ${badges.length ? `<span class="play-nav-badges">${badges.join("")}</span>` : ""}
+        </button>
+      `;
+    })
+    .join("");
+
+  gameLinks = [...playNavEl.querySelectorAll("[data-game-link]")];
+  gameLinks.forEach((button) => {
+    button.addEventListener("click", () => switchGame(button.dataset.gameLink));
+  });
+}
 
 function updateHero(gameId) {
   const info = catalog[gameId];
@@ -95,22 +120,35 @@ function updateHero(gameId) {
   playGenreEl.textContent = info.genre;
   playDifficultyEl.textContent = info.difficulty;
   playDurationEl.textContent = info.duration;
+  document.title = `${info.title} - 小游戏游玩页`;
 }
 
 function setRandomLink() {
-  const candidates = orderedGameIds.filter((id) => id !== currentGameId);
+  const candidates = catalogEntries
+    .filter((game) => game.id !== currentGameId)
+    .sort((left, right) => left.hotRank - right.hotRank)
+    .slice(0, 5)
+    .map((game) => game.id);
   const nextId = candidates[Math.floor(Math.random() * candidates.length)];
-  randomGameBtn.dataset.targetGame = nextId;
+  if (nextId) {
+    randomGameBtn.dataset.targetGame = nextId;
+    return;
+  }
+  delete randomGameBtn.dataset.targetGame;
 }
 
 function switchGame(gameId) {
   currentGameId = gameId;
+  writeRecentGames(gameId);
+  renderPlayNav();
+
   gamePanels.forEach((panel) => {
     panel.classList.toggle("active", panel.dataset.gamePanel === gameId);
   });
   gameLinks.forEach((link) => {
     link.classList.toggle("active", link.dataset.gameLink === gameId);
   });
+  renderRecentPlay();
   updateHero(gameId);
   setRandomLink();
   history.replaceState({}, "", `./play.html?game=${encodeURIComponent(gameId)}`);
@@ -140,9 +178,10 @@ randomGameBtn.addEventListener("click", () => {
     switchGame(nextId);
   }
 });
-gameLinks.forEach((button) => {
-  button.addEventListener("click", () => switchGame(button.dataset.gameLink));
-});
+
+renderHotTags();
+renderPlayNav();
+renderRecentPlay();
 
 const starGame = (() => {
   const canvas = document.getElementById("starCanvas");

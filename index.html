@@ -24,15 +24,15 @@
             <button class="ghost" type="button" data-random-game>随机热门</button>
           </div>
         </div>
-        <div class="hero-stats">
-          <div class="hero-stat-card">
-            <span>游戏总数</span>
-            <strong>10</strong>
-          </div>
-          <div class="hero-stat-card">
-            <span>当前模式</span>
-            <strong>单机</strong>
-          </div>
+          <div class="hero-stats">
+            <div class="hero-stat-card">
+              <span>游戏总数</span>
+              <strong id="homeTotalGames">10</strong>
+            </div>
+            <div class="hero-stat-card">
+              <span>当前模式</span>
+              <strong>单机</strong>
+            </div>
           <div class="hero-stat-card">
             <span>进入方式</span>
             <strong>点卡跳转</strong>
@@ -40,78 +40,63 @@
         </div>
       </section>
 
-      <section class="category-strip">
-        <span>热门动作</span>
-        <span>卡牌策略</span>
-        <span>脑力益智</span>
-        <span>休闲反应</span>
-        <span>经典街机</span>
+      <section class="discover-panel">
+        <div class="discover-main">
+          <div class="discover-head">
+            <div>
+              <p class="eyebrow">4399 STYLE</p>
+              <h2>按分类找游戏</h2>
+            </div>
+            <label class="search-box">
+              <span>搜索游戏</span>
+              <input
+                id="gameSearchInput"
+                type="search"
+                placeholder="输入名字、类型或玩法关键词"
+                autocomplete="off"
+              />
+            </label>
+          </div>
+          <div class="category-strip" id="homeCategoryStrip"></div>
+        </div>
+        <aside class="ranking-panel">
+          <p class="panel-tag">HOT RANK</p>
+          <h2>热门排行</h2>
+          <div id="hotRankingList" class="ranking-list"></div>
+        </aside>
       </section>
 
       <section class="featured-banner">
         <div>
-          <p class="panel-tag">HOT TODAY</p>
-          <h2>贪吃蛇、2048、打砖块已经加入游戏厅</h2>
-          <p>
-            现有 10 个单机小游戏。点开即跳转到专属游玩页，避免首页过长，也更接近小游戏站的使用方式。
-          </p>
+          <p class="panel-tag" id="featuredTag">HOT TODAY</p>
+          <h2 id="featuredTitle">今日热门游戏</h2>
+          <p id="featuredText">点开即跳转到专属游玩页，避免首页过长，也更接近小游戏站的使用方式。</p>
         </div>
-        <button class="primary" type="button" data-open-game="breakout">先玩打砖块</button>
+        <button class="primary" id="featuredPlayBtn" type="button" data-open-game="breakout">先玩打砖块</button>
       </section>
 
-      <section class="game-gallery">
-        <button class="gallery-card hot" type="button" data-open-game="star">
-          <span class="game-card-tag">动作</span>
-          <strong>星落接接乐</strong>
-          <p>接住星星、躲开炸弹，60 秒冲分。</p>
-        </button>
-        <button class="gallery-card" type="button" data-open-game="ddz">
-          <span class="game-card-tag">牌类</span>
-          <strong>斗地主小游戏</strong>
-          <p>单机快速局，和两个 AI 对战。</p>
-        </button>
-        <button class="gallery-card" type="button" data-open-game="ttt">
-          <span class="game-card-tag">策略</span>
-          <strong>井字棋</strong>
-          <p>经典三连线，适合快速来一局。</p>
-        </button>
-        <button class="gallery-card" type="button" data-open-game="memory">
-          <span class="game-card-tag">益智</span>
-          <strong>记忆翻牌</strong>
-          <p>翻开相同图案完成配对。</p>
-        </button>
-        <button class="gallery-card" type="button" data-open-game="mole">
-          <span class="game-card-tag">反应</span>
-          <strong>打地鼠</strong>
-          <p>30 秒快打模式，拼手速和眼力。</p>
-        </button>
-        <button class="gallery-card hot" type="button" data-open-game="snake">
-          <span class="game-card-tag">街机</span>
-          <strong>贪吃蛇</strong>
-          <p>吃豆变长，撞墙或撞自己就结束。</p>
-        </button>
-        <button class="gallery-card" type="button" data-open-game="2048">
-          <span class="game-card-tag">数字</span>
-          <strong>2048</strong>
-          <p>滑动合成更大的数字方块。</p>
-        </button>
-        <button class="gallery-card" type="button" data-open-game="rps">
-          <span class="game-card-tag">休闲</span>
-          <strong>石头剪刀布</strong>
-          <p>三局两胜，适合摸鱼快玩。</p>
-        </button>
-        <button class="gallery-card" type="button" data-open-game="reaction">
-          <span class="game-card-tag">测试</span>
-          <strong>反应速度测试</strong>
-          <p>等信号变绿后立刻点击，刷新最快成绩。</p>
-        </button>
-        <button class="gallery-card hot" type="button" data-open-game="breakout">
-          <span class="game-card-tag">经典</span>
-          <strong>打砖块</strong>
-          <p>接住小球，清光砖块就过关。</p>
-        </button>
+      <section class="gallery-toolbar">
+        <div>
+          <p class="eyebrow">GAME HALL</p>
+          <h2>全部游戏</h2>
+          <p class="panel-message" id="gallerySummary">点按钮即可跳转到独立游玩页。</p>
+        </div>
+        <div class="hero-stats gallery-stats">
+          <div class="hero-stat-card">
+            <span>当前筛选</span>
+            <strong id="currentFilterLabel">全部</strong>
+          </div>
+          <div class="hero-stat-card">
+            <span>可玩游戏</span>
+            <strong id="visibleGameCount">10</strong>
+          </div>
+        </div>
+      </section>
+
+      <section class="game-gallery" id="gameGallery">
       </section>
     </main>
+    <script src="./catalog.js"></script>
     <script src="./home.js"></script>
   </body>
 </html>

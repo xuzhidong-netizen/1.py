@@ -16,18 +16,17 @@
         <button class="back-link" id="backToHomeBtn" type="button">← 返回游戏厅</button>
         <p class="eyebrow">GAME LIST</p>
         <h1>选择游戏</h1>
-        <nav class="play-nav">
-          <button class="play-nav-link" data-game-link="star" type="button">星落接接乐</button>
-          <button class="play-nav-link" data-game-link="ddz" type="button">斗地主小游戏</button>
-          <button class="play-nav-link" data-game-link="ttt" type="button">井字棋</button>
-          <button class="play-nav-link" data-game-link="memory" type="button">记忆翻牌</button>
-          <button class="play-nav-link" data-game-link="mole" type="button">打地鼠</button>
-          <button class="play-nav-link" data-game-link="snake" type="button">贪吃蛇</button>
-          <button class="play-nav-link" data-game-link="2048" type="button">2048</button>
-          <button class="play-nav-link" data-game-link="rps" type="button">石头剪刀布</button>
-          <button class="play-nav-link" data-game-link="reaction" type="button">反应速度测试</button>
-          <button class="play-nav-link" data-game-link="breakout" type="button">打砖块</button>
-        </nav>
+        <nav class="play-nav" id="playNav"></nav>
+        <section class="sidebar-card">
+          <p class="panel-tag">RECENT PLAY</p>
+          <h2>最近游玩</h2>
+          <div id="recentPlayList" class="recent-play-list"></div>
+        </section>
+        <section class="sidebar-card">
+          <p class="panel-tag">HOT TAGS</p>
+          <h2>热门标签</h2>
+          <div id="playHotTags" class="tag-cloud"></div>
+        </section>
       </aside>
 
       <section class="play-main">
@@ -344,6 +343,7 @@
       </section>
     </main>
 
+    <script src="./catalog.js"></script>
     <script src="./game.js"></script>
   </body>
 </html>
