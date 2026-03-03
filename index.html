@@ -3,69 +3,175 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>星落接接乐</title>
+    <title>小游戏大厅</title>
     <meta
       name="description"
-      content="在线玩星落接接乐：接住星星、避开炸弹，挑战 60 秒最高分。"
+      content="小游戏大厅：在同一页面选择游玩星落接接乐和简化版斗地主。"
     />
     <link rel="stylesheet" href="./style.css" />
   </head>
   <body>
     <main class="app">
       <section class="hero">
-        <p class="eyebrow">MINI GAME</p>
-        <h1>星落接接乐</h1>
+        <p class="eyebrow">GAME LOUNGE</p>
+        <h1>小游戏大厅</h1>
         <p class="intro">
-          左右移动接住星星，避开炸弹。60 秒结束，分数越高越好。
+          现在这个页面已经改成统一入口。你可以先玩星落接接乐，也可以切到简化版斗地主，后面继续加新游戏也沿用这一套结构。
         </p>
-        <div class="panel">
-          <div class="stat">
-            <span>得分</span>
-            <strong id="score">0</strong>
-          </div>
-          <div class="stat">
-            <span>生命</span>
-            <strong id="lives">3</strong>
-          </div>
-          <div class="stat">
-            <span>时间</span>
-            <strong id="time">60</strong>
-          </div>
-          <div class="stat stat-wide">
-            <span>最高分</span>
-            <strong id="bestScore">0</strong>
-          </div>
+
+        <div class="lobby-grid">
+          <button class="game-card active" data-game-select="star">
+            <span class="game-card-tag">动作</span>
+            <strong>星落接接乐</strong>
+            <small>接住星星，躲开炸弹，60 秒冲分。</small>
+          </button>
+          <button class="game-card" data-game-select="ddz">
+            <span class="game-card-tag">牌类</span>
+            <strong>斗地主小游戏</strong>
+            <small>单机快速局，和两个 AI 对战。</small>
+          </button>
         </div>
-        <div class="actions">
-          <button id="startBtn" class="primary">开始游戏</button>
-          <button id="soundBtn" class="ghost" type="button">音效：开</button>
-          <p id="message">按方向键移动，接住星星就能得分。</p>
-        </div>
-        <div class="feature-list">
-          <p>60 秒冲分模式</p>
-          <p>最高分自动保存在当前浏览器</p>
-          <p>支持键盘和触屏操作</p>
+
+        <div class="lobby-notes">
+          <p>统一大厅入口，后续新增游戏按同样方式挂载。</p>
+          <p>当前已接入 2 个游戏模块。</p>
+          <p>界面支持桌面和手机宽度。</p>
         </div>
       </section>
 
-      <section class="game-shell">
-        <div class="canvas-wrap">
-          <canvas id="gameCanvas" width="420" height="720"></canvas>
-          <div id="overlay" class="overlay visible">
-            <div class="overlay-card">
-              <p class="overlay-tag">STAR CATCHER</p>
-              <h2 id="overlayTitle">准备开局</h2>
-              <p id="overlayText">
-                接住星星拿分，撞到炸弹或漏接星星都会掉生命。
-              </p>
-              <button id="overlayBtn" class="primary" type="button">立即开始</button>
+      <section class="stage">
+        <article class="game-panel active" data-game-panel="star">
+          <div class="panel-head">
+            <div>
+              <p class="panel-tag">ARCADE</p>
+              <h2>星落接接乐</h2>
+            </div>
+            <div class="panel-actions">
+              <button id="starStartBtn" class="primary" type="button">开始游戏</button>
+              <button id="starSoundBtn" class="ghost" type="button">音效：开</button>
             </div>
           </div>
-        </div>
-        <div class="touch-controls">
-          <button id="leftBtn" aria-label="向左移动">←</button>
-          <button id="rightBtn" aria-label="向右移动">→</button>
-        </div>
+
+          <div class="stats-grid">
+            <div class="stat">
+              <span>得分</span>
+              <strong id="starScore">0</strong>
+            </div>
+            <div class="stat">
+              <span>生命</span>
+              <strong id="starLives">3</strong>
+            </div>
+            <div class="stat">
+              <span>时间</span>
+              <strong id="starTime">60</strong>
+            </div>
+            <div class="stat highlight">
+              <span>最高分</span>
+              <strong id="starBestScore">0</strong>
+            </div>
+          </div>
+
+          <p id="starMessage" class="panel-message">
+            按方向键移动，接住星星就能得分。
+          </p>
+
+          <div class="canvas-wrap">
+            <canvas id="starCanvas" width="420" height="720"></canvas>
+            <div id="starOverlay" class="overlay visible">
+              <div class="overlay-card">
+                <p class="overlay-tag">STAR CATCHER</p>
+                <h3 id="starOverlayTitle">准备开局</h3>
+                <p id="starOverlayText">
+                  接住星星加分，碰到炸弹或漏接星星都会掉生命。
+                </p>
+                <button id="starOverlayBtn" class="primary" type="button">立即开始</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="touch-controls">
+            <button id="starLeftBtn" aria-label="向左移动" type="button">←</button>
+            <button id="starRightBtn" aria-label="向右移动" type="button">→</button>
+          </div>
+        </article>
+
+        <article class="game-panel" data-game-panel="ddz">
+          <div class="panel-head">
+            <div>
+              <p class="panel-tag">CARD BATTLE</p>
+              <h2>简化版斗地主</h2>
+            </div>
+            <div class="panel-actions">
+              <button id="ddzRestartBtn" class="primary" type="button">新开一局</button>
+            </div>
+          </div>
+
+          <div class="ddz-topbar">
+            <div class="stat">
+              <span>当前阶段</span>
+              <strong id="ddzPhase">叫地主</strong>
+            </div>
+            <div class="stat">
+              <span>地主</span>
+              <strong id="ddzLandlord">待定</strong>
+            </div>
+            <div class="stat highlight">
+              <span>桌面牌</span>
+              <strong id="ddzLastPlay">暂无</strong>
+            </div>
+          </div>
+
+          <p id="ddzMessage" class="panel-message">
+            这是快速局斗地主，支持单张、对子、三张、炸弹和王炸。
+          </p>
+
+          <section class="ddz-table">
+            <div class="ddz-opponent">
+              <div class="player-head">
+                <strong>左侧 AI</strong>
+                <span id="ddzLeftCount">17 张</span>
+              </div>
+              <div id="ddzLeftCards" class="opponent-cards" aria-label="左侧 AI 手牌"></div>
+              <p id="ddzLeftAction" class="player-action">等待发牌</p>
+            </div>
+
+            <div class="ddz-center">
+              <div class="bottom-cards-box">
+                <span>底牌</span>
+                <div id="ddzBottomCards" class="bottom-cards"></div>
+              </div>
+              <div class="center-play-box">
+                <span>本轮牌型</span>
+                <div id="ddzCurrentCombo" class="combo-display">暂无</div>
+              </div>
+            </div>
+
+            <div class="ddz-opponent">
+              <div class="player-head">
+                <strong>右侧 AI</strong>
+                <span id="ddzRightCount">17 张</span>
+              </div>
+              <div id="ddzRightCards" class="opponent-cards" aria-label="右侧 AI 手牌"></div>
+              <p id="ddzRightAction" class="player-action">等待发牌</p>
+            </div>
+          </section>
+
+          <section class="ddz-player-area">
+            <div class="player-head">
+              <strong>你</strong>
+              <span id="ddzRole">农民</span>
+            </div>
+            <div id="ddzHand" class="player-hand" aria-label="你的手牌"></div>
+          </section>
+
+          <div class="ddz-controls">
+            <button id="ddzCallBtn" class="primary" type="button">叫地主</button>
+            <button id="ddzPassCallBtn" class="ghost" type="button">不叫</button>
+            <button id="ddzPlayBtn" class="primary" type="button">出牌</button>
+            <button id="ddzPassBtn" class="ghost" type="button">不出</button>
+            <button id="ddzHintBtn" class="ghost" type="button">提示</button>
+          </div>
+        </article>
       </section>
     </main>
 
