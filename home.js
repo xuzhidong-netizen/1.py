@@ -3,6 +3,7 @@ const gameGalleryEl = document.getElementById("gameGallery");
 const categoryStripEl = document.getElementById("homeCategoryStrip");
 const hotRankingListEl = document.getElementById("hotRankingList");
 const gameSearchInput = document.getElementById("gameSearchInput");
+const clearSearchBtn = document.getElementById("clearSearchBtn");
 const featuredTitleEl = document.getElementById("featuredTitle");
 const featuredTextEl = document.getElementById("featuredText");
 const featuredPlayBtn = document.getElementById("featuredPlayBtn");
@@ -10,6 +11,8 @@ const gallerySummaryEl = document.getElementById("gallerySummary");
 const visibleGameCountEl = document.getElementById("visibleGameCount");
 const currentFilterLabelEl = document.getElementById("currentFilterLabel");
 const homeTotalGamesEl = document.getElementById("homeTotalGames");
+const quickTagsEl = document.getElementById("quickTags");
+const jumpToResultsBtn = document.getElementById("jumpToResultsBtn");
 
 const state = {
   filter: "全部",
@@ -80,6 +83,19 @@ function renderFeatured() {
   featuredPlayBtn.textContent = `先玩${featuredGame.title}`;
 }
 
+function renderQuickTags() {
+  const tags = [...new Set(getSortedGames().flatMap((game) => game.tags))].slice(0, 8);
+  quickTagsEl.innerHTML = tags
+    .map(
+      (tag) => `
+        <button class="tag-filter-btn" type="button" data-tag-filter="${tag}">
+          # ${tag}
+        </button>
+      `
+    )
+    .join("");
+}
+
 function renderRanking() {
   hotRankingListEl.innerHTML = getSortedGames()
     .slice(0, 5)
@@ -100,9 +116,13 @@ function renderRanking() {
 
 function renderGallery() {
   const visibleGames = getVisibleGames();
+  const discoverMode = Boolean(state.search.trim()) || state.filter !== "全部";
+  document.body.classList.toggle("is-discovering", discoverMode);
+  gameGalleryEl.classList.toggle("compact-results", discoverMode);
   visibleGameCountEl.textContent = String(visibleGames.length);
   currentFilterLabelEl.textContent = state.filter;
   gallerySummaryEl.textContent = keywordSummary(visibleGames.length);
+  clearSearchBtn.hidden = !state.search.trim();
 
   if (!visibleGames.length) {
     gameGalleryEl.innerHTML = `
@@ -151,9 +171,25 @@ function renderGallery() {
 
 function keywordSummary(count) {
   if (!state.search.trim()) {
+    if (state.filter !== "全部") {
+      return `当前分类为“${state.filter}”，共展示 ${count} 款游戏。`;
+    }
     return `当前展示 ${count} 款游戏，点按钮即可跳转到独立游玩页。`;
   }
-  return `关键词“${state.search.trim()}”共匹配到 ${count} 款游戏。`;
+  return `关键词“${state.search.trim()}”共匹配到 ${count} 款游戏，结果已收紧展示。`;
+}
+
+function scrollToGallery() {
+  gameGalleryEl.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+function applySearch(nextValue, { scroll = false } = {}) {
+  state.search = nextValue;
+  gameSearchInput.value = nextValue;
+  renderGallery();
+  if (scroll) {
+    scrollToGallery();
+  }
 }
 
 document.addEventListener("click", (event) => {
@@ -168,6 +204,13 @@ document.addEventListener("click", (event) => {
     state.filter = categoryButton.dataset.categoryFilter;
     renderCategories();
     renderGallery();
+    scrollToGallery();
+    return;
+  }
+
+  const tagButton = event.target.closest("[data-tag-filter]");
+  if (tagButton) {
+    applySearch(tagButton.dataset.tagFilter, { scroll: true });
     return;
   }
 
@@ -182,12 +225,19 @@ document.addEventListener("click", (event) => {
 });
 
 gameSearchInput.addEventListener("input", (event) => {
-  state.search = event.target.value;
-  renderGallery();
+  applySearch(event.target.value, { scroll: false });
 });
+
+clearSearchBtn.addEventListener("click", () => {
+  applySearch("", { scroll: false });
+  gameSearchInput.focus();
+});
+
+jumpToResultsBtn.addEventListener("click", scrollToGallery);
 
 homeTotalGamesEl.textContent = String(catalogEntries.length);
 renderCategories();
 renderFeatured();
 renderRanking();
+renderQuickTags();
 renderGallery();

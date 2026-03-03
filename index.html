@@ -47,17 +47,21 @@
               <p class="eyebrow">4399 STYLE</p>
               <h2>按分类找游戏</h2>
             </div>
-            <label class="search-box">
+            <div class="search-box">
               <span>搜索游戏</span>
-              <input
-                id="gameSearchInput"
-                type="search"
-                placeholder="输入名字、类型或玩法关键词"
-                autocomplete="off"
-              />
-            </label>
+              <div class="search-input-row">
+                <input
+                  id="gameSearchInput"
+                  type="search"
+                  placeholder="输入名字、类型或玩法关键词"
+                  autocomplete="off"
+                />
+                <button id="clearSearchBtn" class="ghost search-clear" type="button">清空</button>
+              </div>
+            </div>
           </div>
           <div class="category-strip" id="homeCategoryStrip"></div>
+          <div class="quick-tags" id="quickTags"></div>
         </div>
         <aside class="ranking-panel">
           <p class="panel-tag">HOT RANK</p>
@@ -81,7 +85,9 @@
           <h2>全部游戏</h2>
           <p class="panel-message" id="gallerySummary">点按钮即可跳转到独立游玩页。</p>
         </div>
-        <div class="hero-stats gallery-stats">
+        <div class="gallery-actions">
+          <button id="jumpToResultsBtn" class="ghost" type="button">直接看结果</button>
+          <div class="hero-stats gallery-stats">
           <div class="hero-stat-card">
             <span>当前筛选</span>
             <strong id="currentFilterLabel">全部</strong>
@@ -89,6 +95,7 @@
           <div class="hero-stat-card">
             <span>可玩游戏</span>
             <strong id="visibleGameCount">10</strong>
+          </div>
           </div>
         </div>
       </section>
