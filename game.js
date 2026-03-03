@@ -2077,7 +2077,7 @@ function createLineGame(options) {
         cell.type = "button";
         const value = state.board[row][col];
         cell.className = `board-cell ${value === "X" ? "stone-black" : value === "O" ? "stone-white" : ""}`;
-        cell.textContent = value === "X" || value === "O" ? "●" : "";
+        cell.textContent = "";
         cell.addEventListener("click", () => handleMove(row, col));
         boardEl.appendChild(cell);
       }
@@ -2232,7 +2232,7 @@ const connect4Game = (() => {
         const cell = document.createElement("div");
         const value = state.board[row][col];
         cell.className = `board-cell ${value === "X" ? "disc-black" : value === "O" ? "disc-white" : ""}`;
-        cell.textContent = value === "X" ? "●" : value === "O" ? "●" : "";
+        cell.textContent = "";
         boardEl.appendChild(cell);
       }
     }
@@ -2395,7 +2395,7 @@ const reversiGame = (() => {
         cell.className = `board-cell ${
           value === "B" ? "disc-black" : value === "W" ? "disc-white" : legal.has(key) ? "playable" : ""
         }`;
-        cell.textContent = value === "B" || value === "W" ? "●" : legal.has(key) ? "·" : "";
+        cell.textContent = value === "B" || value === "W" ? "" : legal.has(key) ? "·" : "";
         cell.addEventListener("click", () => handleClick(row, col));
         boardEl.appendChild(cell);
       }
@@ -2573,7 +2573,7 @@ const checkersGame = (() => {
         cell.className = `board-cell ${dark ? "dark" : ""} ${
           value === "P" ? "checker-red" : value === "A" ? "checker-blue" : ""
         } ${selected ? "selected" : ""} ${legalTargets.has(`${row}-${col}`) ? "available" : ""}`;
-        cell.textContent = value === "P" ? "●" : value === "A" ? "●" : "";
+        cell.textContent = "";
         cell.addEventListener("click", () => handleClick(row, col));
         boardEl.appendChild(cell);
       }
