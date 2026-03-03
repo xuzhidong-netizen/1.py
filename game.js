@@ -2935,5 +2935,771 @@ const hexpawnGame = (() => {
 })();
 gameModules.hexpawn = hexpawnGame;
 
+const xiangqiGame = (() => {
+  const boardEl = document.getElementById("xiangqiBoard");
+  const playerCountEl = document.getElementById("xiangqiPlayerCount");
+  const aiCountEl = document.getElementById("xiangqiAiCount");
+  const turnEl = document.getElementById("xiangqiTurn");
+  const messageEl = document.getElementById("xiangqiMessage");
+  const restartBtn = document.getElementById("xiangqiRestartBtn");
+  const rows = 10;
+  const cols = 9;
+  const pieceText = {
+    P: { K: "帅", G: "仕", E: "相", H: "马", R: "车", C: "炮", P: "兵" },
+    A: { K: "将", G: "士", E: "象", H: "马", R: "车", C: "炮", P: "卒" },
+  };
+  const pieceValues = { K: 100000, R: 900, C: 500, H: 400, E: 220, G: 180, P: 100 };
+  const horseRules = [
+    { leg: [-1, 0], move: [-2, -1] },
+    { leg: [-1, 0], move: [-2, 1] },
+    { leg: [1, 0], move: [2, -1] },
+    { leg: [1, 0], move: [2, 1] },
+    { leg: [0, -1], move: [-1, -2] },
+    { leg: [0, -1], move: [1, -2] },
+    { leg: [0, 1], move: [-1, 2] },
+    { leg: [0, 1], move: [1, 2] },
+  ];
+  const state = { active: currentGameId === "xiangqi", board: [], selected: null, turn: "P", over: false };
+
+  function inside(row, col) {
+    return row >= 0 && row < rows && col >= 0 && col < cols;
+  }
+
+  function sideOf(piece) {
+    return piece ? piece[0] : "";
+  }
+
+  function typeOf(piece) {
+    return piece ? piece[1] : "";
+  }
+
+  function cloneBoard(board) {
+    return board.map((line) => line.slice());
+  }
+
+  function insidePalace(side, row, col) {
+    const rowRange = side === "P" ? row >= 7 && row <= 9 : row >= 0 && row <= 2;
+    return rowRange && col >= 3 && col <= 5;
+  }
+
+  function crossedRiver(side, row) {
+    return side === "P" ? row <= 4 : row >= 5;
+  }
+
+  function findGeneral(board, side) {
+    for (let row = 0; row < rows; row += 1) {
+      for (let col = 0; col < cols; col += 1) {
+        if (board[row][col] === `${side}K`) {
+          return [row, col];
+        }
+      }
+    }
+    return null;
+  }
+
+  function clearFile(board, col, startRow, endRow) {
+    const low = Math.min(startRow, endRow);
+    const high = Math.max(startRow, endRow);
+    for (let row = low + 1; row < high; row += 1) {
+      if (board[row][col]) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  function generalsFacing(board) {
+    const playerGeneral = findGeneral(board, "P");
+    const aiGeneral = findGeneral(board, "A");
+    return Boolean(
+      playerGeneral &&
+      aiGeneral &&
+      playerGeneral[1] === aiGeneral[1] &&
+      clearFile(board, playerGeneral[1], playerGeneral[0], aiGeneral[0])
+    );
+  }
+
+  function applyMove(board, move) {
+    const next = cloneBoard(board);
+    const piece = next[move.from[0]][move.from[1]];
+    next[move.from[0]][move.from[1]] = "";
+    next[move.row][move.col] = piece;
+    return next;
+  }
+
+  function pseudoMovesFor(board, row, col) {
+    const piece = board[row][col];
+    if (!piece) return [];
+    const side = sideOf(piece);
+    const enemy = side === "P" ? "A" : "P";
+    const type = typeOf(piece);
+    const moves = [];
+
+    function pushMove(nextRow, nextCol) {
+      if (!inside(nextRow, nextCol)) return;
+      const target = board[nextRow][nextCol];
+      if (!target || sideOf(target) === enemy) {
+        moves.push({ from: [row, col], row: nextRow, col: nextCol, capture: target || "" });
+      }
+    }
+
+    if (type === "K") {
+      [
+        [1, 0],
+        [-1, 0],
+        [0, 1],
+        [0, -1],
+      ].forEach(([dr, dc]) => {
+        const nextRow = row + dr;
+        const nextCol = col + dc;
+        if (insidePalace(side, nextRow, nextCol)) {
+          pushMove(nextRow, nextCol);
+        }
+      });
+      const enemyGeneral = findGeneral(board, enemy);
+      if (enemyGeneral && enemyGeneral[1] === col && clearFile(board, col, row, enemyGeneral[0])) {
+        moves.push({ from: [row, col], row: enemyGeneral[0], col, capture: board[enemyGeneral[0]][col] });
+      }
+      return moves;
+    }
+
+    if (type === "G") {
+      [
+        [1, 1],
+        [1, -1],
+        [-1, 1],
+        [-1, -1],
+      ].forEach(([dr, dc]) => {
+        const nextRow = row + dr;
+        const nextCol = col + dc;
+        if (insidePalace(side, nextRow, nextCol)) {
+          pushMove(nextRow, nextCol);
+        }
+      });
+      return moves;
+    }
+
+    if (type === "E") {
+      [
+        [2, 2],
+        [2, -2],
+        [-2, 2],
+        [-2, -2],
+      ].forEach(([dr, dc]) => {
+        const nextRow = row + dr;
+        const nextCol = col + dc;
+        const eyeRow = row + dr / 2;
+        const eyeCol = col + dc / 2;
+        const crossRiver = side === "P" ? nextRow < 5 : nextRow > 4;
+        if (!inside(nextRow, nextCol) || crossRiver || board[eyeRow][eyeCol]) return;
+        pushMove(nextRow, nextCol);
+      });
+      return moves;
+    }
+
+    if (type === "H") {
+      horseRules.forEach((rule) => {
+        const legRow = row + rule.leg[0];
+        const legCol = col + rule.leg[1];
+        const nextRow = row + rule.move[0];
+        const nextCol = col + rule.move[1];
+        if (!inside(nextRow, nextCol) || board[legRow][legCol]) return;
+        pushMove(nextRow, nextCol);
+      });
+      return moves;
+    }
+
+    if (type === "R") {
+      [
+        [1, 0],
+        [-1, 0],
+        [0, 1],
+        [0, -1],
+      ].forEach(([dr, dc]) => {
+        let nextRow = row + dr;
+        let nextCol = col + dc;
+        while (inside(nextRow, nextCol)) {
+          const target = board[nextRow][nextCol];
+          if (!target) {
+            moves.push({ from: [row, col], row: nextRow, col: nextCol, capture: "" });
+          } else {
+            if (sideOf(target) === enemy) {
+              moves.push({ from: [row, col], row: nextRow, col: nextCol, capture: target });
+            }
+            break;
+          }
+          nextRow += dr;
+          nextCol += dc;
+        }
+      });
+      return moves;
+    }
+
+    if (type === "C") {
+      [
+        [1, 0],
+        [-1, 0],
+        [0, 1],
+        [0, -1],
+      ].forEach(([dr, dc]) => {
+        let nextRow = row + dr;
+        let nextCol = col + dc;
+        let jumped = false;
+        while (inside(nextRow, nextCol)) {
+          const target = board[nextRow][nextCol];
+          if (!jumped) {
+            if (!target) {
+              moves.push({ from: [row, col], row: nextRow, col: nextCol, capture: "" });
+            } else {
+              jumped = true;
+            }
+          } else if (target) {
+            if (sideOf(target) === enemy) {
+              moves.push({ from: [row, col], row: nextRow, col: nextCol, capture: target });
+            }
+            break;
+          }
+          nextRow += dr;
+          nextCol += dc;
+        }
+      });
+      return moves;
+    }
+
+    if (type === "P") {
+      const forward = side === "P" ? -1 : 1;
+      pushMove(row + forward, col);
+      if (crossedRiver(side, row)) {
+        pushMove(row, col - 1);
+        pushMove(row, col + 1);
+      }
+    }
+    return moves;
+  }
+
+  function isSquareAttacked(board, row, col, attackerSide) {
+    for (let boardRow = 0; boardRow < rows; boardRow += 1) {
+      for (let boardCol = 0; boardCol < cols; boardCol += 1) {
+        if (sideOf(board[boardRow][boardCol]) !== attackerSide) continue;
+        if (
+          pseudoMovesFor(board, boardRow, boardCol).some(
+            (move) => move.row === row && move.col === col
+          )
+        ) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  function legalMovesFor(board, side) {
+    const enemy = side === "P" ? "A" : "P";
+    const result = [];
+    for (let row = 0; row < rows; row += 1) {
+      for (let col = 0; col < cols; col += 1) {
+        if (sideOf(board[row][col]) !== side) continue;
+        pseudoMovesFor(board, row, col).forEach((move) => {
+          const next = applyMove(board, move);
+          const general = findGeneral(next, side);
+          if (!general || generalsFacing(next)) return;
+          if (isSquareAttacked(next, general[0], general[1], enemy)) return;
+          result.push(move);
+        });
+      }
+    }
+    return result;
+  }
+
+  function updateCounts() {
+    let player = 0;
+    let ai = 0;
+    state.board.forEach((line) =>
+      line.forEach((piece) => {
+        if (sideOf(piece) === "P") player += 1;
+        if (sideOf(piece) === "A") ai += 1;
+      })
+    );
+    playerCountEl.textContent = String(player);
+    aiCountEl.textContent = String(ai);
+    return { player, ai };
+  }
+
+  function finish(message) {
+    state.over = true;
+    turnEl.textContent = "结束";
+    messageEl.textContent = message;
+    render();
+  }
+
+  function scoreMove(move) {
+    const movingPiece = state.board[move.from[0]][move.from[1]];
+    const movingType = typeOf(movingPiece);
+    const targetGeneral = findGeneral(state.board, "P");
+    const next = applyMove(state.board, move);
+    let score = 0;
+    if (move.capture) {
+      score += pieceValues[typeOf(move.capture)] * 20;
+    }
+    if (movingType === "P") score += move.row * 6;
+    if (movingType === "R" || movingType === "C") score += 14 - Math.abs(move.col - 4) * 2;
+    if (movingType === "H") score += 8 - Math.abs(move.col - 4);
+    if (movingType === "K") score -= 24;
+    if (targetGeneral) {
+      score += 16 - (Math.abs(move.row - targetGeneral[0]) + Math.abs(move.col - targetGeneral[1]));
+    }
+    const playerGeneral = findGeneral(next, "P");
+    if (!playerGeneral) return 999999;
+    if (isSquareAttacked(next, playerGeneral[0], playerGeneral[1], "A")) {
+      score += 80;
+    }
+    return score;
+  }
+
+  function aiTurn() {
+    if (!state.active || state.over || state.turn !== "A") return;
+    const moves = legalMovesFor(state.board, "A");
+    if (!moves.length) {
+      finish("黑方已经无棋可走，你守住了棋局。");
+      return;
+    }
+    const scored = moves
+      .map((move) => ({ move, score: scoreMove(move) }))
+      .sort((left, right) => right.score - left.score);
+    const topScore = scored[0].score;
+    const topMoves = scored.filter((item) => item.score >= topScore - 12).map((item) => item.move);
+    const move = randomFrom(topMoves);
+    state.board = applyMove(state.board, move);
+    updateCounts();
+    if (!findGeneral(state.board, "P")) {
+      finish("你的帅被黑方吃掉了。");
+      return;
+    }
+    if (!legalMovesFor(state.board, "P").length) {
+      finish("你已经无合法走法，这局输了。");
+      return;
+    }
+    state.turn = "P";
+    turnEl.textContent = "你";
+    messageEl.textContent = move.capture
+      ? `电脑吃掉了你的${pieceText.P[typeOf(move.capture)]}，轮到你应对。`
+      : "电脑已走子，轮到你了。";
+    render();
+  }
+
+  function handleClick(row, col) {
+    if (!state.active || state.over || state.turn !== "P") return;
+    const piece = state.board[row][col];
+    const playerMoves = legalMovesFor(state.board, "P");
+    if (sideOf(piece) === "P") {
+      const hasMoves = playerMoves.some((move) => move.from[0] === row && move.from[1] === col);
+      if (!hasMoves) {
+        messageEl.textContent = "这个棋子当前没有合法走法。";
+        return;
+      }
+      state.selected = [row, col];
+      render();
+      return;
+    }
+    if (!state.selected) return;
+    const move = playerMoves.find(
+      (item) =>
+        item.from[0] === state.selected[0] &&
+        item.from[1] === state.selected[1] &&
+        item.row === row &&
+        item.col === col
+    );
+    if (!move) return;
+    state.board = applyMove(state.board, move);
+    state.selected = null;
+    updateCounts();
+    if (!findGeneral(state.board, "A")) {
+      finish("你拿下了黑将，赢了这局。");
+      return;
+    }
+    if (!legalMovesFor(state.board, "A").length) {
+      finish("黑方已无合法走法，你赢了。");
+      return;
+    }
+    state.turn = "A";
+    turnEl.textContent = "电脑";
+    messageEl.textContent = move.capture
+      ? `你吃掉了黑方${pieceText.A[typeOf(move.capture)]}，电脑正在思考。`
+      : "电脑正在应招。";
+    render();
+    window.setTimeout(aiTurn, 260);
+  }
+
+  function render() {
+    const legalTargets = new Set();
+    if (state.selected) {
+      legalMovesFor(state.board, "P")
+        .filter((move) => move.from[0] === state.selected[0] && move.from[1] === state.selected[1])
+        .forEach((move) => legalTargets.add(`${move.row}-${move.col}`));
+    }
+    boardEl.innerHTML = "";
+    for (let row = 0; row < rows; row += 1) {
+      for (let col = 0; col < cols; col += 1) {
+        const piece = state.board[row][col];
+        const key = `${row}-${col}`;
+        const selected = state.selected && state.selected[0] === row && state.selected[1] === col;
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = `board-cell xiangqi-cell ${
+          row === 4 || row === 5 ? "xiangqi-river" : ""
+        } ${
+          sideOf(piece) === "P" ? "xiangqi-piece-player" : sideOf(piece) === "A" ? "xiangqi-piece-ai" : ""
+        } ${selected ? "selected" : ""} ${legalTargets.has(key) ? "available xiangqi-legal" : ""}`;
+        btn.textContent = piece ? pieceText[sideOf(piece)][typeOf(piece)] : legalTargets.has(key) ? "·" : "";
+        btn.addEventListener("click", () => handleClick(row, col));
+        boardEl.appendChild(btn);
+      }
+    }
+  }
+
+  function start() {
+    state.board = [
+      ["AR", "AH", "AE", "AG", "AK", "AG", "AE", "AH", "AR"],
+      ["", "", "", "", "", "", "", "", ""],
+      ["", "AC", "", "", "", "", "", "AC", ""],
+      ["AP", "", "AP", "", "AP", "", "AP", "", "AP"],
+      ["", "", "", "", "", "", "", "", ""],
+      ["", "", "", "", "", "", "", "", ""],
+      ["PP", "", "PP", "", "PP", "", "PP", "", "PP"],
+      ["", "PC", "", "", "", "", "", "PC", ""],
+      ["", "", "", "", "", "", "", "", ""],
+      ["PR", "PH", "PE", "PG", "PK", "PG", "PE", "PH", "PR"],
+    ];
+    state.selected = null;
+    state.turn = "P";
+    state.over = false;
+    turnEl.textContent = "你";
+    messageEl.textContent = "你执红先手，点击棋子后再点高亮位置走棋。";
+    updateCounts();
+    render();
+  }
+
+  restartBtn.addEventListener("click", start);
+  start();
+  state.start = start;
+  return state;
+})();
+gameModules.xiangqi = xiangqiGame;
+
+const junqiGame = (() => {
+  const boardEl = document.getElementById("junqiBoard");
+  const playerCountEl = document.getElementById("junqiPlayerCount");
+  const aiCountEl = document.getElementById("junqiAiCount");
+  const turnEl = document.getElementById("junqiTurn");
+  const messageEl = document.getElementById("junqiMessage");
+  const restartBtn = document.getElementById("junqiRestartBtn");
+  const rows = 6;
+  const cols = 5;
+  const pieceText = { F: "旗", M: "雷", B: "炸", S: "司", J: "军", L: "师", T: "团", G: "工" };
+  const pieceValues = { F: 10000, M: 320, B: 380, S: 900, J: 700, L: 520, T: 360, G: 260 };
+  const rankOrder = { S: 7, J: 6, L: 5, T: 4, G: 3 };
+  const state = { active: currentGameId === "junqi", board: [], selected: null, turn: "P", over: false };
+
+  function inside(row, col) {
+    return row >= 0 && row < rows && col >= 0 && col < cols;
+  }
+
+  function sideOf(piece) {
+    return piece ? piece[0] : "";
+  }
+
+  function typeOf(piece) {
+    return piece ? piece[1] : "";
+  }
+
+  function cloneBoard(board) {
+    return board.map((line) => line.slice());
+  }
+
+  function isMovable(piece) {
+    return Boolean(piece) && !["F", "M"].includes(typeOf(piece));
+  }
+
+  function locateFlag(board, side) {
+    for (let row = 0; row < rows; row += 1) {
+      for (let col = 0; col < cols; col += 1) {
+        if (board[row][col] === `${side}F`) {
+          return [row, col];
+        }
+      }
+    }
+    return null;
+  }
+
+  function countPieces() {
+    let player = 0;
+    let ai = 0;
+    state.board.forEach((line) =>
+      line.forEach((piece) => {
+        if (sideOf(piece) === "P") player += 1;
+        if (sideOf(piece) === "A") ai += 1;
+      })
+    );
+    playerCountEl.textContent = String(player);
+    aiCountEl.textContent = String(ai);
+    return { player, ai };
+  }
+
+  function movableCount(board, side) {
+    let total = 0;
+    board.forEach((line) =>
+      line.forEach((piece) => {
+        if (sideOf(piece) === side && isMovable(piece)) {
+          total += 1;
+        }
+      })
+    );
+    return total;
+  }
+
+  function legalMovesFor(board, side) {
+    const result = [];
+    for (let row = 0; row < rows; row += 1) {
+      for (let col = 0; col < cols; col += 1) {
+        const piece = board[row][col];
+        if (sideOf(piece) !== side || !isMovable(piece)) continue;
+        [
+          [1, 0],
+          [-1, 0],
+          [0, 1],
+          [0, -1],
+        ].forEach(([dr, dc]) => {
+          const nextRow = row + dr;
+          const nextCol = col + dc;
+          if (!inside(nextRow, nextCol)) return;
+          const target = board[nextRow][nextCol];
+          if (sideOf(target) === side) return;
+          result.push({ from: [row, col], row: nextRow, col: nextCol, capture: target || "" });
+        });
+      }
+    }
+    return result;
+  }
+
+  function resolveBattle(attacker, defender) {
+    if (!defender) {
+      return { winner: "attacker", flag: false };
+    }
+    const attackerType = typeOf(attacker);
+    const defenderType = typeOf(defender);
+    if (defenderType === "F") {
+      return { winner: "attacker", flag: true };
+    }
+    if (attackerType === "B" || defenderType === "B") {
+      return { winner: "none", flag: false };
+    }
+    if (defenderType === "M") {
+      if (attackerType === "G") {
+        return { winner: "attacker", flag: false };
+      }
+      return { winner: "defender", flag: false };
+    }
+    const attackerRank = rankOrder[attackerType] || 0;
+    const defenderRank = rankOrder[defenderType] || 0;
+    if (attackerRank > defenderRank) return { winner: "attacker", flag: false };
+    if (attackerRank < defenderRank) return { winner: "defender", flag: false };
+    return { winner: "none", flag: false };
+  }
+
+  function applyMove(board, move) {
+    const next = cloneBoard(board);
+    const attacker = next[move.from[0]][move.from[1]];
+    const defender = next[move.row][move.col];
+    const outcome = resolveBattle(attacker, defender);
+    next[move.from[0]][move.from[1]] = "";
+    if (!defender || outcome.winner === "attacker") {
+      next[move.row][move.col] = attacker;
+    } else if (outcome.winner === "defender") {
+      next[move.row][move.col] = defender;
+    } else {
+      next[move.row][move.col] = "";
+    }
+    return { board: next, outcome };
+  }
+
+  function moveSummary(attackerSide, move, outcome) {
+    const attackerLabel = attackerSide === "P" ? "你" : "电脑";
+    if (!move.capture) return `${attackerLabel}推进了一步。`;
+    if (outcome.flag) return `${attackerLabel}拿下了军旗。`;
+    if (outcome.winner === "attacker") {
+      return `${attackerLabel}吃掉了${attackerSide === "P" ? "敌方" : "你的"}${pieceText[typeOf(move.capture)]}。`;
+    }
+    if (outcome.winner === "defender") {
+      return `${attackerLabel}进攻失败，撞上了${attackerSide === "P" ? "敌方" : "你的"}${pieceText[typeOf(move.capture)]}。`;
+    }
+    return `${attackerLabel}与${attackerSide === "P" ? "敌方" : "你的"}${pieceText[typeOf(move.capture)]}同归于尽。`;
+  }
+
+  function outcomeMessage(board, attackerSide, move, outcome) {
+    const enemy = attackerSide === "P" ? "A" : "P";
+    if (outcome.flag || !locateFlag(board, enemy)) {
+      return attackerSide === "P" ? "你成功夺下军旗，赢了。" : "电脑夺下了你的军旗。";
+    }
+    if (!movableCount(board, enemy)) {
+      return attackerSide === "P" ? "敌方已经没有机动兵力，你赢了。" : "你已经没有可移动棋子，这局输了。";
+    }
+    if (!movableCount(board, attackerSide)) {
+      return attackerSide === "P" ? "你已经没有可移动棋子，这局输了。" : "电脑已经失去机动兵力，你赢了。";
+    }
+    return moveSummary(attackerSide, move, outcome);
+  }
+
+  function finish(message) {
+    state.over = true;
+    turnEl.textContent = "结束";
+    messageEl.textContent = message;
+    render();
+  }
+
+  function scoreMove(move) {
+    const piece = state.board[move.from[0]][move.from[1]];
+    const next = applyMove(state.board, move);
+    const playerFlag = locateFlag(state.board, "P");
+    let score = 0;
+    if (next.outcome.flag) return 999999;
+    if (move.capture) {
+      if (next.outcome.winner === "attacker") {
+        score += pieceValues[typeOf(move.capture)] * 16;
+      } else if (next.outcome.winner === "none") {
+        score += pieceValues[typeOf(move.capture)] * 9 - pieceValues[typeOf(piece)] * 4;
+      } else {
+        score -= pieceValues[typeOf(piece)] * 12;
+      }
+    }
+    score += move.row * 8;
+    if (playerFlag) {
+      score += 18 - (Math.abs(move.row - playerFlag[0]) + Math.abs(move.col - playerFlag[1])) * 2;
+    }
+    if (typeOf(piece) === "S" || typeOf(piece) === "J") score += 10;
+    return score;
+  }
+
+  function aiTurn() {
+    if (!state.active || state.over || state.turn !== "A") return;
+    const moves = legalMovesFor(state.board, "A");
+    if (!moves.length) {
+      finish("敌方已经没有可移动棋子，你守住了军旗。");
+      return;
+    }
+    const scored = moves
+      .map((move) => ({ move, score: scoreMove(move) }))
+      .sort((left, right) => right.score - left.score);
+    const topScore = scored[0].score;
+    const move = randomFrom(scored.filter((item) => item.score >= topScore - 8).map((item) => item.move));
+    const next = applyMove(state.board, move);
+    state.board = next.board;
+    countPieces();
+    const summary = outcomeMessage(state.board, "A", move, next.outcome);
+    if (summary.endsWith("输了。") || summary.endsWith("军旗。")) {
+      finish(summary);
+      return;
+    }
+    state.turn = "P";
+    turnEl.textContent = "你";
+    messageEl.textContent = `${summary} 轮到你了。`;
+    render();
+  }
+
+  function handleClick(row, col) {
+    if (!state.active || state.over || state.turn !== "P") return;
+    const piece = state.board[row][col];
+    const legalMoves = legalMovesFor(state.board, "P");
+    if (sideOf(piece) === "P") {
+      if (!isMovable(piece)) {
+        messageEl.textContent = "军旗和地雷不能移动。";
+        return;
+      }
+      const hasMove = legalMoves.some((move) => move.from[0] === row && move.from[1] === col);
+      if (!hasMove) {
+        messageEl.textContent = "这个棋子目前没有可走的位置。";
+        return;
+      }
+      state.selected = [row, col];
+      render();
+      return;
+    }
+    if (!state.selected) return;
+    const move = legalMoves.find(
+      (item) =>
+        item.from[0] === state.selected[0] &&
+        item.from[1] === state.selected[1] &&
+        item.row === row &&
+        item.col === col
+    );
+    if (!move) return;
+    const next = applyMove(state.board, move);
+    state.board = next.board;
+    state.selected = null;
+    countPieces();
+    const summary = outcomeMessage(state.board, "P", move, next.outcome);
+    if (summary.endsWith("赢了。") || summary.endsWith("输了。")) {
+      finish(summary);
+      return;
+    }
+    state.turn = "A";
+    turnEl.textContent = "电脑";
+    messageEl.textContent = `${summary} 电脑正在调兵。`;
+    render();
+    window.setTimeout(aiTurn, 220);
+  }
+
+  function render() {
+    const legalTargets = new Set();
+    if (state.selected) {
+      legalMovesFor(state.board, "P")
+        .filter((move) => move.from[0] === state.selected[0] && move.from[1] === state.selected[1])
+        .forEach((move) => legalTargets.add(`${move.row}-${move.col}`));
+    }
+    boardEl.innerHTML = "";
+    for (let row = 0; row < rows; row += 1) {
+      for (let col = 0; col < cols; col += 1) {
+        const piece = state.board[row][col];
+        const type = typeOf(piece);
+        const selected = state.selected && state.selected[0] === row && state.selected[1] === col;
+        const key = `${row}-${col}`;
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = `board-cell junqi-cell ${((row + col) % 2 === 0) ? "junqi-rail" : ""} ${
+          sideOf(piece) === "P" ? "junqi-piece-player" : sideOf(piece) === "A" ? "junqi-piece-ai" : ""
+        } ${type === "F" ? "junqi-flag" : ""} ${type === "M" ? "junqi-mine" : ""} ${
+          selected ? "selected" : ""
+        } ${legalTargets.has(key) ? "available junqi-legal" : ""}`;
+        btn.textContent = piece ? pieceText[type] : legalTargets.has(key) ? "·" : "";
+        btn.addEventListener("click", () => handleClick(row, col));
+        boardEl.appendChild(btn);
+      }
+    }
+  }
+
+  function start() {
+    state.board = [
+      ["AB", "AS", "AF", "AJ", "AM"],
+      ["AT", "AL", "", "AG", ""],
+      ["", "", "", "", ""],
+      ["", "", "", "", ""],
+      ["", "PG", "", "PL", "PT"],
+      ["PM", "PJ", "PF", "PS", "PB"],
+    ];
+    state.selected = null;
+    state.turn = "P";
+    state.over = false;
+    turnEl.textContent = "你";
+    messageEl.textContent = "简化军棋规则：夺下对方军旗，或让对手失去全部可移动棋子即可获胜。";
+    countPieces();
+    render();
+  }
+
+  restartBtn.addEventListener("click", start);
+  start();
+  state.start = start;
+  return state;
+})();
+gameModules.junqi = junqiGame;
+
 activateCurrentGame(currentGameId);
 startCurrentGame();

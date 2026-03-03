@@ -33,3 +33,37 @@ test("independent play page starts the requested game directly", async (t) => {
   const pieces = document.querySelectorAll("#connect4Board .disc-black, #connect4Board .disc-white");
   assert.ok(pieces.length >= 2);
 });
+
+test("xiangqi basic move flow is playable", async (t) => {
+  const dom = createPlayDom("xiangqi");
+  t.after(() => destroyDom(dom));
+  const { document } = dom.window;
+
+  assert.equal(document.querySelector(".game-panel.active").dataset.gamePanel, "xiangqi");
+  let cells = document.querySelectorAll("#xiangqiBoard .board-cell");
+  click(cells[54], dom.window);
+  cells = document.querySelectorAll("#xiangqiBoard .board-cell");
+  click(cells[45], dom.window);
+  await wait(dom.window, 320);
+  cells = document.querySelectorAll("#xiangqiBoard .board-cell");
+  assert.equal(cells.length, 90);
+  assert.ok(document.querySelector("#xiangqiBoard .xiangqi-piece-player"));
+  assert.ok(document.querySelector("#xiangqiBoard .xiangqi-piece-ai"));
+});
+
+test("junqi basic move flow is playable", async (t) => {
+  const dom = createPlayDom("junqi");
+  t.after(() => destroyDom(dom));
+  const { document } = dom.window;
+
+  assert.equal(document.querySelector(".game-panel.active").dataset.gamePanel, "junqi");
+  let cells = document.querySelectorAll("#junqiBoard .board-cell");
+  click(cells[21], dom.window);
+  cells = document.querySelectorAll("#junqiBoard .board-cell");
+  click(cells[16], dom.window);
+  await wait(dom.window, 280);
+  cells = document.querySelectorAll("#junqiBoard .board-cell");
+  assert.equal(cells.length, 30);
+  assert.ok(document.querySelector("#junqiBoard .junqi-piece-player"));
+  assert.ok(document.querySelector("#junqiBoard .junqi-piece-ai"));
+});

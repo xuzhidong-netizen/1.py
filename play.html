@@ -493,6 +493,44 @@
           <p id="hexpawnMessage" class="panel-message">兵卒只能前进，斜向吃子，先冲到底线或吃光对手获胜。</p>
           <div id="hexpawnBoard" class="board-grid hexpawn-grid" aria-label="兵卒棋棋盘"></div>
         </article>
+
+        <article class="game-panel" data-game-panel="xiangqi">
+          <div class="panel-head">
+            <div>
+              <p class="panel-tag">TRADITIONAL</p>
+              <h2>中国象棋</h2>
+            </div>
+            <div class="panel-actions">
+              <button id="xiangqiRestartBtn" class="primary" type="button">重新开局</button>
+            </div>
+          </div>
+          <div class="mini-topbar">
+            <div class="stat"><span>红方棋子</span><strong id="xiangqiPlayerCount">16</strong></div>
+            <div class="stat"><span>黑方棋子</span><strong id="xiangqiAiCount">16</strong></div>
+            <div class="stat highlight"><span>轮到</span><strong id="xiangqiTurn">你</strong></div>
+          </div>
+          <p id="xiangqiMessage" class="panel-message">你执红先手，点击棋子后再点高亮位置走棋。</p>
+          <div id="xiangqiBoard" class="board-grid xiangqi-grid" aria-label="中国象棋棋盘"></div>
+        </article>
+
+        <article class="game-panel" data-game-panel="junqi">
+          <div class="panel-head">
+            <div>
+              <p class="panel-tag">TACTIC BOARD</p>
+              <h2>军棋</h2>
+            </div>
+            <div class="panel-actions">
+              <button id="junqiRestartBtn" class="primary" type="button">重新布阵</button>
+            </div>
+          </div>
+          <div class="mini-topbar">
+            <div class="stat"><span>我方兵力</span><strong id="junqiPlayerCount">8</strong></div>
+            <div class="stat"><span>敌方兵力</span><strong id="junqiAiCount">8</strong></div>
+            <div class="stat highlight"><span>轮到</span><strong id="junqiTurn">你</strong></div>
+          </div>
+          <p id="junqiMessage" class="panel-message">简化军棋规则：夺下对方军旗，或让对手失去全部可移动棋子即可获胜。</p>
+          <div id="junqiBoard" class="board-grid junqi-grid" aria-label="军棋棋盘"></div>
+        </article>
       </section>
     </main>
 

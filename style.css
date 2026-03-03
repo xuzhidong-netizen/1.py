@@ -1072,6 +1072,14 @@ canvas {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+.xiangqi-grid {
+  grid-template-columns: repeat(9, minmax(0, 1fr));
+}
+
+.junqi-grid {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
 .board-cell,
 .column-btn {
   min-height: 44px;
@@ -1083,6 +1091,13 @@ canvas {
   color: #17253a;
   background: rgba(255, 255, 255, 0.76);
   cursor: pointer;
+}
+
+.board-cell.xiangqi-cell,
+.board-cell.junqi-cell {
+  min-height: 52px;
+  font-size: 1.05rem;
+  font-weight: 700;
 }
 
 .board-cell:hover,
@@ -1194,6 +1209,58 @@ canvas {
   box-shadow:
     inset 0 0 0 2px rgba(255, 209, 102, 0.82),
     0 0 0 1px rgba(255, 255, 255, 0.3);
+}
+
+.board-cell.xiangqi-piece-player,
+.board-cell.xiangqi-piece-ai,
+.board-cell.junqi-piece-player,
+.board-cell.junqi-piece-ai {
+  border-width: 2px;
+  letter-spacing: 0.04em;
+}
+
+.board-cell.xiangqi-piece-player,
+.board-cell.junqi-piece-player {
+  color: #c43636;
+  background: linear-gradient(180deg, rgba(255, 249, 242, 0.96), rgba(250, 223, 214, 0.92));
+  border-color: rgba(196, 54, 54, 0.34);
+}
+
+.board-cell.xiangqi-piece-ai,
+.board-cell.junqi-piece-ai {
+  color: #173047;
+  background: linear-gradient(180deg, rgba(246, 250, 255, 0.96), rgba(212, 228, 246, 0.92));
+  border-color: rgba(23, 48, 71, 0.24);
+}
+
+.board-cell.xiangqi-legal,
+.board-cell.junqi-legal {
+  color: #4f6f8e;
+  font-size: 1rem;
+}
+
+.board-cell.xiangqi-river {
+  background:
+    linear-gradient(180deg, rgba(233, 243, 255, 0.88), rgba(209, 228, 247, 0.9)),
+    rgba(255, 255, 255, 0.76);
+}
+
+.board-cell.junqi-rail {
+  background:
+    linear-gradient(180deg, rgba(229, 234, 243, 0.9), rgba(208, 219, 233, 0.92)),
+    rgba(255, 255, 255, 0.76);
+}
+
+.board-cell.junqi-flag {
+  box-shadow:
+    inset 0 0 0 2px rgba(255, 209, 102, 0.55),
+    0 0 0 1px rgba(255, 255, 255, 0.24);
+}
+
+.board-cell.junqi-mine {
+  background-image:
+    radial-gradient(circle at 50% 50%, rgba(255, 209, 102, 0.32), transparent 65%),
+    linear-gradient(180deg, rgba(255, 249, 242, 0.96), rgba(250, 223, 214, 0.92));
 }
 
 .board-cell.dark {
@@ -1693,6 +1760,14 @@ canvas {
     grid-template-columns: repeat(11, minmax(24px, 1fr));
   }
 
+  .xiangqi-grid {
+    grid-template-columns: repeat(9, minmax(28px, 1fr));
+  }
+
+  .junqi-grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+
   .connect4-grid,
   .reversi-grid,
   .checkers-grid,
@@ -1707,6 +1782,12 @@ canvas {
     min-height: 34px;
     font-size: 0.92rem;
     border-radius: 10px;
+  }
+
+  .board-cell.xiangqi-cell,
+  .board-cell.junqi-cell {
+    min-height: 42px;
+    font-size: 0.9rem;
   }
 
   .hanoi-board {

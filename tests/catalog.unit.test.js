@@ -7,7 +7,7 @@ test("catalog keeps unique ids and complete metadata", () => {
   const ids = games.map((game) => game.id);
   const ranks = games.map((game) => game.hotRank);
 
-  assert.equal(games.length, 20);
+  assert.equal(games.length, 22);
   assert.equal(new Set(ids).size, games.length);
   assert.equal(new Set(ranks).size, games.length);
 
