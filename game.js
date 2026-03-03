@@ -2077,7 +2077,7 @@ function createLineGame(options) {
         cell.type = "button";
         const value = state.board[row][col];
         cell.className = `board-cell ${value === "X" ? "stone-black" : value === "O" ? "stone-white" : ""}`;
-        cell.textContent = value === "X" ? "●" : value === "O" ? "○" : "";
+        cell.textContent = value === "X" || value === "O" ? "●" : "";
         cell.addEventListener("click", () => handleMove(row, col));
         boardEl.appendChild(cell);
       }
