@@ -56,7 +56,8 @@ button {
 }
 
 .home-shell,
-.play-shell {
+.play-shell,
+.solo-shell {
   position: relative;
   z-index: 1;
   width: min(1280px, calc(100% - 32px));
@@ -578,6 +579,18 @@ body.is-discovering .gallery-stats {
   grid-template-columns: 320px 1fr;
   gap: 20px;
   align-items: start;
+}
+
+.solo-shell {
+  width: min(1120px, calc(100% - 24px));
+}
+
+.solo-topbar {
+  margin-bottom: 16px;
+}
+
+.solo-stage .game-panel {
+  margin-top: 0;
 }
 
 .play-sidebar {
@@ -1429,7 +1442,8 @@ canvas {
 
 @media (max-width: 720px) {
   .home-shell,
-  .play-shell {
+  .play-shell,
+  .solo-shell {
     width: min(100%, calc(100% - 20px));
     padding: 20px 0 28px;
   }
@@ -1552,9 +1566,15 @@ canvas {
   .play-sidebar,
   .sidebar-card,
   .play-hero,
-  .game-panel {
+  .game-panel,
+  .solo-topbar {
     padding: 18px;
     border-radius: 22px;
+  }
+
+  .solo-topbar {
+    padding: 0;
+    margin-bottom: 12px;
   }
 
   .play-nav {

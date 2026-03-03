@@ -10,8 +10,9 @@ test("usability: key affordances and mobile metadata exist", () => {
 
   assert.match(indexHtml, /name="viewport"/);
   assert.match(playHtml, /name="viewport"/);
-  assert.match(indexHtml, /id="clearSearchBtn"/);
-  assert.match(indexHtml, /id="jumpToResultsBtn"/);
+  assert.match(playHtml, /id="backToHomeBtn"/);
+  assert.doesNotMatch(playHtml, /id="playNav"/);
+  assert.doesNotMatch(playHtml, /id="quickStartBtn"/);
 });
 
 test("usability: rendered cards and nav buttons include readable labels", (t) => {
@@ -26,11 +27,10 @@ test("usability: rendered cards and nav buttons include readable labels", (t) =>
     assert.ok(card.textContent.trim().length > 8);
   });
 
-  playDom.window.document.querySelectorAll("#playNav .play-nav-link").forEach((button) => {
-    assert.ok(button.textContent.includes(" "));
-  });
-
+  assert.equal(playDom.window.document.querySelectorAll(".back-link").length, 1);
+  assert.equal(playDom.window.document.querySelectorAll(".solo-topbar").length, 1);
+  assert.equal(playDom.window.document.querySelectorAll(".game-panel.active").length, 1);
   assert.ok(playDom.window.document.getElementById("starLeftBtn"));
   assert.ok(playDom.window.document.getElementById("starRightBtn"));
-  assert.ok(playDom.window.document.getElementById("quickStartBtn"));
+  assert.equal(playDom.window.document.getElementById("playNav"), null);
 });

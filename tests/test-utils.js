@@ -55,7 +55,12 @@ function installBrowserStubs(window) {
         connect() {},
         start() {},
         stop() {},
-        frequency: { value: 0 },
+        frequency: {
+          value: 0,
+          setValueAtTime() {},
+          linearRampToValueAtTime() {},
+          exponentialRampToValueAtTime() {},
+        },
         type: "sine",
       };
     }

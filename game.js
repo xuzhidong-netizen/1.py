@@ -1,15 +1,5 @@
 const gamePanels = document.querySelectorAll("[data-game-panel]");
-const quickStartBtn = document.getElementById("quickStartBtn");
-const randomGameBtn = document.getElementById("randomGameBtn");
 const backToHomeBtn = document.getElementById("backToHomeBtn");
-const playTitleEl = document.getElementById("playTitle");
-const playDescriptionEl = document.getElementById("playDescription");
-const playGenreEl = document.getElementById("playGenre");
-const playDifficultyEl = document.getElementById("playDifficulty");
-const playDurationEl = document.getElementById("playDuration");
-const playNavEl = document.getElementById("playNav");
-const recentPlayListEl = document.getElementById("recentPlayList");
-const playHotTagsEl = document.getElementById("playHotTags");
 
 const gameModules = {};
 const params = new URLSearchParams(window.location.search);
@@ -18,7 +8,6 @@ const catalog = Object.fromEntries(catalogEntries.map((game) => [game.id, game])
 const orderedGameIds = catalogEntries.map((game) => game.id);
 const recentGamesKey = "arcade-recent-games";
 let currentGameId = orderedGameIds.includes(params.get("game")) ? params.get("game") : orderedGameIds[0] || "star";
-let gameLinks = [];
 
 function readRecentGames() {
   try {
@@ -35,123 +24,19 @@ function writeRecentGames(gameId) {
   return next;
 }
 
-function renderHotTags() {
-  const tagCounter = new Map();
-  catalogEntries
-    .filter((game) => game.hotRank <= 5)
-    .forEach((game) => {
-      game.tags.forEach((tag) => {
-        tagCounter.set(tag, (tagCounter.get(tag) || 0) + 1);
-      });
-    });
-
-  const tags = [...tagCounter.entries()]
-    .sort((left, right) => right[1] - left[1])
-    .slice(0, 6)
-    .map(([tag]) => `<span class="tag-chip">${tag}</span>`)
-    .join("");
-
-  playHotTagsEl.innerHTML = tags || `<span class="sidebar-empty">暂无热门标签</span>`;
-}
-
-function renderRecentPlay() {
-  const recentGames = readRecentGames();
-  if (!recentGames.length) {
-    recentPlayListEl.innerHTML = `<p class="sidebar-empty">还没有最近游玩，先开一局。</p>`;
-    return;
-  }
-
-  recentPlayListEl.innerHTML = recentGames
-    .map((gameId, index) => {
-      const info = catalog[gameId];
-      return `
-        <button class="recent-link" type="button" data-recent-game="${gameId}">
-          <span class="recent-link-rank">${index + 1}</span>
-          <span class="recent-link-copy">
-            <strong>${info.title}</strong>
-            <span>${info.genre}</span>
-          </span>
-        </button>
-      `;
-    })
-    .join("");
-
-  recentPlayListEl.querySelectorAll("[data-recent-game]").forEach((button) => {
-    button.addEventListener("click", () => switchGame(button.dataset.recentGame));
-  });
-}
-
-function renderPlayNav() {
-  const recentGames = readRecentGames();
-  playNavEl.innerHTML = orderedGameIds
-    .map((gameId) => {
-      const info = catalog[gameId];
-      const badges = [];
-      if (info.hotRank <= 3) {
-        badges.push(`<span class="nav-badge hot">TOP ${info.hotRank}</span>`);
-      }
-      if (recentGames.includes(gameId)) {
-        badges.push(`<span class="nav-badge recent">最近玩</span>`);
-      }
-
-      return `
-        <button class="play-nav-link" type="button" data-game-link="${gameId}">
-          <span class="play-nav-icon">${info.icon}</span>
-          <span class="play-nav-copy">
-            <strong>${info.title}</strong>
-            <span>${info.genre}</span>
-          </span>
-          ${badges.length ? `<span class="play-nav-badges">${badges.join("")}</span>` : ""}
-        </button>
-      `;
-    })
-    .join("");
-
-  gameLinks = [...playNavEl.querySelectorAll("[data-game-link]")];
-  gameLinks.forEach((button) => {
-    button.addEventListener("click", () => switchGame(button.dataset.gameLink));
-  });
-}
-
-function updateHero(gameId) {
+function updatePageMeta(gameId) {
   const info = catalog[gameId];
-  playTitleEl.textContent = info.title;
-  playDescriptionEl.textContent = info.description;
-  playGenreEl.textContent = info.genre;
-  playDifficultyEl.textContent = info.difficulty;
-  playDurationEl.textContent = info.duration;
   document.title = `${info.title} - 小游戏游玩页`;
 }
 
-function setRandomLink() {
-  const candidates = catalogEntries
-    .filter((game) => game.id !== currentGameId)
-    .sort((left, right) => left.hotRank - right.hotRank)
-    .slice(0, 5)
-    .map((game) => game.id);
-  const nextId = candidates[Math.floor(Math.random() * candidates.length)];
-  if (nextId) {
-    randomGameBtn.dataset.targetGame = nextId;
-    return;
-  }
-  delete randomGameBtn.dataset.targetGame;
-}
-
-function switchGame(gameId) {
+function activateCurrentGame(gameId) {
   currentGameId = gameId;
   writeRecentGames(gameId);
-  renderPlayNav();
 
   gamePanels.forEach((panel) => {
     panel.classList.toggle("active", panel.dataset.gamePanel === gameId);
   });
-  gameLinks.forEach((link) => {
-    link.classList.toggle("active", link.dataset.gameLink === gameId);
-  });
-  renderRecentPlay();
-  updateHero(gameId);
-  setRandomLink();
-  history.replaceState({}, "", `./play.html?game=${encodeURIComponent(gameId)}`);
+  updatePageMeta(gameId);
 
   Object.entries(gameModules).forEach(([id, module]) => {
     module.active = id === gameId;
@@ -168,20 +53,9 @@ function startCurrentGame() {
   }
 }
 
-quickStartBtn.addEventListener("click", startCurrentGame);
 backToHomeBtn.addEventListener("click", () => {
   window.location.href = "./index.html";
 });
-randomGameBtn.addEventListener("click", () => {
-  const nextId = randomGameBtn.dataset.targetGame;
-  if (nextId) {
-    switchGame(nextId);
-  }
-});
-
-renderHotTags();
-renderPlayNav();
-renderRecentPlay();
 
 const starGame = (() => {
   const canvas = document.getElementById("starCanvas");
@@ -3061,4 +2935,5 @@ const hexpawnGame = (() => {
 })();
 gameModules.hexpawn = hexpawnGame;
 
-switchGame(currentGameId);
+activateCurrentGame(currentGameId);
+startCurrentGame();

@@ -1,19 +1,19 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
-const { createPlayDom, destroyDom, click, wait } = require("./test-utils");
+const { createPlayDom, destroyDom, loadCatalogData } = require("./test-utils");
 
-test("stability: repeated switching across all game panels does not break active state", async (t) => {
-  const dom = createPlayDom("star");
-  t.after(() => destroyDom(dom));
-  const { document } = dom.window;
-  const navButtons = [...document.querySelectorAll("#playNav .play-nav-link")];
+test("stability: each game opens as an isolated single-page play scene", async () => {
+  const games = loadCatalogData();
 
-  for (const button of navButtons) {
-    click(button, dom.window);
-    await wait(dom.window, 30);
+  for (const game of games) {
+    const dom = createPlayDom(game.id);
+    const { document } = dom.window;
     const activePanel = document.querySelector(".game-panel.active");
     assert.ok(activePanel);
-    assert.equal(activePanel.dataset.gamePanel, button.dataset.gameLink);
-    assert.ok(document.getElementById("playTitle").textContent.length > 0);
+    assert.equal(activePanel.dataset.gamePanel, game.id);
+    assert.equal(document.querySelectorAll(".game-panel.active").length, 1);
+    assert.equal(document.querySelectorAll(".back-link").length, 1);
+    assert.equal(document.getElementById("playNav"), null);
+    destroyDom(dom);
   }
 });

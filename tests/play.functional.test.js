@@ -7,20 +7,25 @@ test("play page switches games and basic board interactions are playable", async
   t.after(() => destroyDom(dom));
   const { document } = dom.window;
 
-  assert.equal(document.getElementById("playTitle").textContent, "五子棋");
-  assert.equal(document.querySelectorAll("#playNav .play-nav-link").length, 20);
+  assert.equal(document.querySelectorAll(".game-panel.active").length, 1);
+  assert.equal(document.querySelector(".game-panel.active").dataset.gamePanel, "gomoku");
+  assert.equal(document.querySelectorAll(".solo-topbar .back-link").length, 1);
+  assert.equal(document.getElementById("playNav"), null);
 
   const gomokuCells = document.querySelectorAll("#gomokuBoard .board-cell");
   click(gomokuCells[0], dom.window);
   await wait(dom.window, 260);
   assert.equal(document.querySelectorAll("#gomokuBoard .stone-black").length, 1);
   assert.equal(document.querySelectorAll("#gomokuBoard .stone-white").length, 1);
+});
 
-  const connect4Button = [...document.querySelectorAll("#playNav .play-nav-link")].find((button) =>
-    button.textContent.includes("四子棋")
-  );
-  click(connect4Button, dom.window);
-  assert.equal(document.getElementById("playTitle").textContent, "四子棋");
+test("independent play page starts the requested game directly", async (t) => {
+  const dom = createPlayDom("connect4");
+  t.after(() => destroyDom(dom));
+  const { document } = dom.window;
+
+  assert.equal(document.querySelectorAll(".game-panel.active").length, 1);
+  assert.equal(document.querySelector(".game-panel.active").dataset.gamePanel, "connect4");
 
   const firstColumn = document.querySelector("#connect4Columns .column-btn");
   click(firstColumn, dom.window);

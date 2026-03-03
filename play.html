@@ -11,51 +11,12 @@
     <link rel="stylesheet" href="./style.css" />
   </head>
   <body class="play-page">
-    <main class="play-shell">
-      <aside class="play-sidebar">
-        <button class="back-link" id="backToHomeBtn" type="button">← 返回游戏厅</button>
-        <p class="eyebrow">GAME LIST</p>
-        <h1>选择游戏</h1>
-        <nav class="play-nav" id="playNav"></nav>
-        <section class="sidebar-card">
-          <p class="panel-tag">RECENT PLAY</p>
-          <h2>最近游玩</h2>
-          <div id="recentPlayList" class="recent-play-list"></div>
-        </section>
-        <section class="sidebar-card">
-          <p class="panel-tag">HOT TAGS</p>
-          <h2>热门标签</h2>
-          <div id="playHotTags" class="tag-cloud"></div>
-        </section>
-      </aside>
+    <main class="solo-shell">
+      <header class="solo-topbar">
+        <button class="back-link" id="backToHomeBtn" type="button">← 返回游戏大厅</button>
+      </header>
 
-      <section class="play-main">
-        <section class="play-hero">
-          <div>
-            <p class="panel-tag">NOW PLAYING</p>
-            <h2 id="playTitle">星落接接乐</h2>
-            <p id="playDescription" class="panel-message">接住星星、躲开炸弹，60 秒冲分。</p>
-          </div>
-          <div class="play-hero-actions">
-            <button id="quickStartBtn" class="primary" type="button">开始当前游戏</button>
-            <button id="randomGameBtn" class="ghost" type="button">换个游戏</button>
-          </div>
-        </section>
-
-        <section class="meta-strip">
-          <div class="stat highlight">
-            <span>类型</span>
-            <strong id="playGenre">动作反应</strong>
-          </div>
-          <div class="stat">
-            <span>难度</span>
-            <strong id="playDifficulty">简单上手</strong>
-          </div>
-          <div class="stat">
-            <span>推荐时长</span>
-            <strong id="playDuration">1 分钟</strong>
-          </div>
-        </section>
+      <section class="solo-stage">
 
         <article class="game-panel active" data-game-panel="star">
           <div class="panel-head">
