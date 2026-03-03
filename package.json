@@ -1,0 +1,10 @@
+{
+  "name": "mini-arcade-hall",
+  "private": true,
+  "scripts": {
+    "test": "node --test tests/*.test.js"
+  },
+  "devDependencies": {
+    "jsdom": "^28.1.0"
+  }
+}
