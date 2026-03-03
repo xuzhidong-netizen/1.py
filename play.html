@@ -13,20 +13,20 @@
   <body class="play-page">
     <main class="play-shell">
       <aside class="play-sidebar">
-        <a class="back-link" href="./index.html">← 返回游戏厅</a>
+        <button class="back-link" id="backToHomeBtn" type="button">← 返回游戏厅</button>
         <p class="eyebrow">GAME LIST</p>
         <h1>选择游戏</h1>
         <nav class="play-nav">
-          <a class="play-nav-link" data-game-link="star" href="./play.html?game=star">星落接接乐</a>
-          <a class="play-nav-link" data-game-link="ddz" href="./play.html?game=ddz">斗地主小游戏</a>
-          <a class="play-nav-link" data-game-link="ttt" href="./play.html?game=ttt">井字棋</a>
-          <a class="play-nav-link" data-game-link="memory" href="./play.html?game=memory">记忆翻牌</a>
-          <a class="play-nav-link" data-game-link="mole" href="./play.html?game=mole">打地鼠</a>
-          <a class="play-nav-link" data-game-link="snake" href="./play.html?game=snake">贪吃蛇</a>
-          <a class="play-nav-link" data-game-link="2048" href="./play.html?game=2048">2048</a>
-          <a class="play-nav-link" data-game-link="rps" href="./play.html?game=rps">石头剪刀布</a>
-          <a class="play-nav-link" data-game-link="reaction" href="./play.html?game=reaction">反应速度测试</a>
-          <a class="play-nav-link" data-game-link="breakout" href="./play.html?game=breakout">打砖块</a>
+          <button class="play-nav-link" data-game-link="star" type="button">星落接接乐</button>
+          <button class="play-nav-link" data-game-link="ddz" type="button">斗地主小游戏</button>
+          <button class="play-nav-link" data-game-link="ttt" type="button">井字棋</button>
+          <button class="play-nav-link" data-game-link="memory" type="button">记忆翻牌</button>
+          <button class="play-nav-link" data-game-link="mole" type="button">打地鼠</button>
+          <button class="play-nav-link" data-game-link="snake" type="button">贪吃蛇</button>
+          <button class="play-nav-link" data-game-link="2048" type="button">2048</button>
+          <button class="play-nav-link" data-game-link="rps" type="button">石头剪刀布</button>
+          <button class="play-nav-link" data-game-link="reaction" type="button">反应速度测试</button>
+          <button class="play-nav-link" data-game-link="breakout" type="button">打砖块</button>
         </nav>
       </aside>
 
@@ -39,7 +39,7 @@
           </div>
           <div class="play-hero-actions">
             <button id="quickStartBtn" class="primary" type="button">开始当前游戏</button>
-            <a id="randomGameLink" class="ghost" href="./play.html?game=snake">换个游戏</a>
+            <button id="randomGameBtn" class="ghost" type="button">换个游戏</button>
           </div>
         </section>
 

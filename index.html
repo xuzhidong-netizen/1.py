@@ -20,8 +20,8 @@
             参照经典小游戏站点的感觉重做了首页。先看游戏列表，选中后跳转到独立游戏页开始玩，不再挤在一个页面里。
           </p>
           <div class="hero-actions">
-            <a class="primary" href="./play.html?game=star">马上开玩</a>
-            <a class="ghost" href="./play.html?game=snake">随机热门</a>
+            <button class="primary" type="button" data-open-game="star">马上开玩</button>
+            <button class="ghost" type="button" data-random-game>随机热门</button>
           </div>
         </div>
         <div class="hero-stats">
@@ -56,61 +56,62 @@
             现有 10 个单机小游戏。点开即跳转到专属游玩页，避免首页过长，也更接近小游戏站的使用方式。
           </p>
         </div>
-        <a class="primary" href="./play.html?game=breakout">先玩打砖块</a>
+        <button class="primary" type="button" data-open-game="breakout">先玩打砖块</button>
       </section>
 
       <section class="game-gallery">
-        <a class="gallery-card hot" href="./play.html?game=star">
+        <button class="gallery-card hot" type="button" data-open-game="star">
           <span class="game-card-tag">动作</span>
           <strong>星落接接乐</strong>
           <p>接住星星、躲开炸弹，60 秒冲分。</p>
-        </a>
-        <a class="gallery-card" href="./play.html?game=ddz">
+        </button>
+        <button class="gallery-card" type="button" data-open-game="ddz">
           <span class="game-card-tag">牌类</span>
           <strong>斗地主小游戏</strong>
           <p>单机快速局，和两个 AI 对战。</p>
-        </a>
-        <a class="gallery-card" href="./play.html?game=ttt">
+        </button>
+        <button class="gallery-card" type="button" data-open-game="ttt">
           <span class="game-card-tag">策略</span>
           <strong>井字棋</strong>
           <p>经典三连线，适合快速来一局。</p>
-        </a>
-        <a class="gallery-card" href="./play.html?game=memory">
+        </button>
+        <button class="gallery-card" type="button" data-open-game="memory">
           <span class="game-card-tag">益智</span>
           <strong>记忆翻牌</strong>
           <p>翻开相同图案完成配对。</p>
-        </a>
-        <a class="gallery-card" href="./play.html?game=mole">
+        </button>
+        <button class="gallery-card" type="button" data-open-game="mole">
           <span class="game-card-tag">反应</span>
           <strong>打地鼠</strong>
           <p>30 秒快打模式，拼手速和眼力。</p>
-        </a>
-        <a class="gallery-card hot" href="./play.html?game=snake">
+        </button>
+        <button class="gallery-card hot" type="button" data-open-game="snake">
           <span class="game-card-tag">街机</span>
           <strong>贪吃蛇</strong>
           <p>吃豆变长，撞墙或撞自己就结束。</p>
-        </a>
-        <a class="gallery-card" href="./play.html?game=2048">
+        </button>
+        <button class="gallery-card" type="button" data-open-game="2048">
           <span class="game-card-tag">数字</span>
           <strong>2048</strong>
           <p>滑动合成更大的数字方块。</p>
-        </a>
-        <a class="gallery-card" href="./play.html?game=rps">
+        </button>
+        <button class="gallery-card" type="button" data-open-game="rps">
           <span class="game-card-tag">休闲</span>
           <strong>石头剪刀布</strong>
           <p>三局两胜，适合摸鱼快玩。</p>
-        </a>
-        <a class="gallery-card" href="./play.html?game=reaction">
+        </button>
+        <button class="gallery-card" type="button" data-open-game="reaction">
           <span class="game-card-tag">测试</span>
           <strong>反应速度测试</strong>
           <p>等信号变绿后立刻点击，刷新最快成绩。</p>
-        </a>
-        <a class="gallery-card hot" href="./play.html?game=breakout">
+        </button>
+        <button class="gallery-card hot" type="button" data-open-game="breakout">
           <span class="game-card-tag">经典</span>
           <strong>打砖块</strong>
           <p>接住小球，清光砖块就过关。</p>
-        </a>
+        </button>
       </section>
     </main>
+    <script src="./home.js"></script>
   </body>
 </html>

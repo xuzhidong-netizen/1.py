@@ -51,6 +51,10 @@ input {
   font: inherit;
 }
 
+button {
+  border: 0;
+}
+
 .home-shell,
 .play-shell {
   position: relative;
@@ -130,6 +134,7 @@ h1 {
 .touch-controls button,
 .play-nav-link,
 .gallery-card,
+.back-link,
 .reaction-pad {
   transition: transform 140ms ease, border-color 140ms ease, background 140ms ease;
 }
@@ -221,11 +226,16 @@ h1 {
 
 .gallery-card {
   display: block;
+  width: 100%;
+  text-align: left;
   padding: 18px;
   min-height: 190px;
+  border: 1px solid var(--line);
+  border-radius: 28px;
   background:
     linear-gradient(135deg, rgba(255, 209, 102, 0.08), rgba(124, 231, 255, 0.04)),
     rgba(255, 255, 255, 0.04);
+  cursor: pointer;
 }
 
 .gallery-card.hot {
@@ -258,9 +268,18 @@ h1 {
 }
 
 .back-link {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   margin-bottom: 16px;
+  padding: 0;
   color: var(--cyan);
+  background: transparent;
+  cursor: pointer;
+}
+
+.back-link:hover {
+  transform: translateY(-1px);
 }
 
 .play-nav {
@@ -270,10 +289,14 @@ h1 {
 }
 
 .play-nav-link {
+  width: 100%;
+  text-align: left;
   padding: 12px 14px;
   border: 1px solid var(--line);
   border-radius: 16px;
+  color: var(--text);
   background: rgba(255, 255, 255, 0.04);
+  cursor: pointer;
 }
 
 .play-nav-link.active {
@@ -683,6 +706,16 @@ canvas {
   color: var(--text);
   font-size: 1.4rem;
   cursor: pointer;
+}
+
+.gallery-card:focus-visible,
+.play-nav-link:focus-visible,
+.back-link:focus-visible,
+.primary:focus-visible,
+.ghost:focus-visible,
+.reaction-pad:focus-visible {
+  outline: 2px solid rgba(124, 231, 255, 0.8);
+  outline-offset: 2px;
 }
 
 .reaction-pad.ready {

@@ -1,7 +1,8 @@
 const gamePanels = document.querySelectorAll("[data-game-panel]");
 const gameLinks = document.querySelectorAll("[data-game-link]");
 const quickStartBtn = document.getElementById("quickStartBtn");
-const randomGameLink = document.getElementById("randomGameLink");
+const randomGameBtn = document.getElementById("randomGameBtn");
+const backToHomeBtn = document.getElementById("backToHomeBtn");
 const playTitleEl = document.getElementById("playTitle");
 const playDescriptionEl = document.getElementById("playDescription");
 const playGenreEl = document.getElementById("playGenre");
@@ -99,7 +100,7 @@ function updateHero(gameId) {
 function setRandomLink() {
   const candidates = orderedGameIds.filter((id) => id !== currentGameId);
   const nextId = candidates[Math.floor(Math.random() * candidates.length)];
-  randomGameLink.href = `./play.html?game=${encodeURIComponent(nextId)}`;
+  randomGameBtn.dataset.targetGame = nextId;
 }
 
 function switchGame(gameId) {
@@ -112,6 +113,7 @@ function switchGame(gameId) {
   });
   updateHero(gameId);
   setRandomLink();
+  history.replaceState({}, "", `./play.html?game=${encodeURIComponent(gameId)}`);
 
   Object.entries(gameModules).forEach(([id, module]) => {
     module.active = id === gameId;
@@ -129,6 +131,18 @@ function startCurrentGame() {
 }
 
 quickStartBtn.addEventListener("click", startCurrentGame);
+backToHomeBtn.addEventListener("click", () => {
+  window.location.href = "./index.html";
+});
+randomGameBtn.addEventListener("click", () => {
+  const nextId = randomGameBtn.dataset.targetGame;
+  if (nextId) {
+    switchGame(nextId);
+  }
+});
+gameLinks.forEach((button) => {
+  button.addEventListener("click", () => switchGame(button.dataset.gameLink));
+});
 
 const starGame = (() => {
   const canvas = document.getElementById("starCanvas");
