@@ -1,5 +1,6 @@
 const gameButtons = document.querySelectorAll("[data-game-select]");
 const gamePanels = document.querySelectorAll("[data-game-panel]");
+const gameModules = {};
 
 function switchGame(gameId) {
   gameButtons.forEach((button) => {
@@ -8,10 +9,11 @@ function switchGame(gameId) {
   gamePanels.forEach((panel) => {
     panel.classList.toggle("active", panel.dataset.gamePanel === gameId);
   });
-  starGame.active = gameId === "star";
-  douDiZhu.active = gameId === "ddz";
-  if (gameId === "ddz" && typeof douDiZhu.onActivate === "function") {
-    douDiZhu.onActivate();
+  Object.entries(gameModules).forEach(([id, module]) => {
+    module.active = id === gameId;
+  });
+  if (gameModules[gameId] && typeof gameModules[gameId].onActivate === "function") {
+    gameModules[gameId].onActivate();
   }
 }
 
@@ -424,6 +426,7 @@ const starGame = (() => {
 
   return state;
 })();
+gameModules.star = starGame;
 
 const douDiZhu = (() => {
   const phaseEl = document.getElementById("ddzPhase");
@@ -1019,5 +1022,364 @@ const douDiZhu = (() => {
   state.onActivate = queueAiTurnIfNeeded;
   return state;
 })();
+gameModules.ddz = douDiZhu;
+
+const ticTacToe = (() => {
+  const boardEl = document.getElementById("tttBoard");
+  const turnEl = document.getElementById("tttTurn");
+  const scoreEl = document.getElementById("tttScore");
+  const messageEl = document.getElementById("tttMessage");
+  const restartBtn = document.getElementById("tttRestartBtn");
+
+  const state = {
+    active: false,
+    board: Array(9).fill(""),
+    turn: "human",
+    locked: false,
+    scores: {
+      human: 0,
+      ai: 0,
+    },
+  };
+
+  const lines = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [2, 4, 6],
+  ];
+
+  function winner(board) {
+    for (const [a, b, c] of lines) {
+      if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+        return board[a];
+      }
+    }
+    return board.every(Boolean) ? "draw" : null;
+  }
+
+  function updateHud() {
+    turnEl.textContent = state.turn === "human" ? "你" : "电脑";
+    scoreEl.textContent = `${state.scores.human} : ${state.scores.ai}`;
+  }
+
+  function render() {
+    boardEl.innerHTML = "";
+    state.board.forEach((cell, index) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "ttt-cell";
+      button.textContent = cell;
+      button.disabled = Boolean(cell) || state.locked || state.turn !== "human";
+      button.addEventListener("click", () => handleHumanMove(index));
+      boardEl.appendChild(button);
+    });
+    updateHud();
+  }
+
+  function chooseAiMove() {
+    const order = [4, 0, 2, 6, 8, 1, 3, 5, 7];
+    for (const mark of ["O", "X"]) {
+      for (const [a, b, c] of lines) {
+        const line = [state.board[a], state.board[b], state.board[c]];
+        const count = line.filter((item) => item === mark).length;
+        const empty = [a, b, c].find((position) => state.board[position] === "");
+        if (count === 2 && empty !== undefined) {
+          return empty;
+        }
+      }
+    }
+    return order.find((index) => !state.board[index]);
+  }
+
+  function finishRound(result) {
+    state.locked = true;
+    if (result === "X") {
+      state.scores.human += 1;
+      messageEl.textContent = "你赢了这一局。";
+    } else if (result === "O") {
+      state.scores.ai += 1;
+      messageEl.textContent = "电脑赢了这一局。";
+    } else {
+      messageEl.textContent = "平局，再来一局。";
+    }
+    updateHud();
+  }
+
+  function afterMove() {
+    const result = winner(state.board);
+    if (result) {
+      finishRound(result);
+      render();
+      return true;
+    }
+    return false;
+  }
+
+  function handleHumanMove(index) {
+    if (state.board[index] || state.locked || state.turn !== "human") {
+      return;
+    }
+    state.board[index] = "X";
+    if (afterMove()) {
+      return;
+    }
+    state.turn = "ai";
+    messageEl.textContent = "电脑思考中。";
+    render();
+    setTimeout(() => {
+      const move = chooseAiMove();
+      if (move === undefined) {
+        return;
+      }
+      state.board[move] = "O";
+      if (afterMove()) {
+        return;
+      }
+      state.turn = "human";
+      messageEl.textContent = "轮到你落子。";
+      render();
+    }, 320);
+  }
+
+  function resetRound() {
+    state.board = Array(9).fill("");
+    state.turn = "human";
+    state.locked = false;
+    messageEl.textContent = "你使用 X，电脑使用 O。";
+    render();
+  }
+
+  restartBtn.addEventListener("click", resetRound);
+  resetRound();
+  return state;
+})();
+gameModules.ttt = ticTacToe;
+
+const memoryGame = (() => {
+  const gridEl = document.getElementById("memoryGrid");
+  const movesEl = document.getElementById("memoryMoves");
+  const pairsEl = document.getElementById("memoryPairs");
+  const bestEl = document.getElementById("memoryBest");
+  const messageEl = document.getElementById("memoryMessage");
+  const restartBtn = document.getElementById("memoryRestartBtn");
+  const bestKey = "memory-best-moves";
+
+  const state = {
+    active: false,
+    cards: [],
+    opened: [],
+    locked: false,
+    moves: 0,
+    matches: 0,
+    best: Number(localStorage.getItem(bestKey) || 0),
+  };
+
+  const symbols = ["🍎", "🍊", "🍉", "🍇", "🥝", "🍓", "🍒", "🥥"];
+
+  function shuffle(array) {
+    const next = [...array];
+    for (let i = next.length - 1; i > 0; i -= 1) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [next[i], next[j]] = [next[j], next[i]];
+    }
+    return next;
+  }
+
+  function updateHud() {
+    movesEl.textContent = String(state.moves);
+    pairsEl.textContent = `${state.matches} / 8`;
+    bestEl.textContent = state.best ? String(state.best) : "-";
+  }
+
+  function render() {
+    gridEl.innerHTML = "";
+    state.cards.forEach((card, index) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = `memory-card${card.revealed ? " revealed" : ""}${card.matched ? " matched" : ""}`;
+      button.textContent = card.revealed || card.matched ? card.symbol : "";
+      button.disabled = card.matched || card.revealed || state.locked;
+      button.addEventListener("click", () => flipCard(index));
+      gridEl.appendChild(button);
+    });
+    updateHud();
+  }
+
+  function finishIfNeeded() {
+    if (state.matches !== 8) {
+      return;
+    }
+    messageEl.textContent = `完成配对，共用了 ${state.moves} 步。`;
+    if (!state.best || state.moves < state.best) {
+      state.best = state.moves;
+      localStorage.setItem(bestKey, String(state.best));
+      messageEl.textContent = `新纪录，只用了 ${state.moves} 步。`;
+    }
+    updateHud();
+  }
+
+  function flipCard(index) {
+    const card = state.cards[index];
+    if (card.revealed || card.matched || state.locked) {
+      return;
+    }
+
+    card.revealed = true;
+    state.opened.push(index);
+    render();
+
+    if (state.opened.length < 2) {
+      return;
+    }
+
+    state.moves += 1;
+    const [firstIndex, secondIndex] = state.opened;
+    const first = state.cards[firstIndex];
+    const second = state.cards[secondIndex];
+
+    if (first.symbol === second.symbol) {
+      first.matched = true;
+      second.matched = true;
+      state.matches += 1;
+      state.opened = [];
+      messageEl.textContent = "配对成功。";
+      render();
+      finishIfNeeded();
+      return;
+    }
+
+    state.locked = true;
+    messageEl.textContent = "没配对上，再试一次。";
+    setTimeout(() => {
+      first.revealed = false;
+      second.revealed = false;
+      state.opened = [];
+      state.locked = false;
+      render();
+    }, 650);
+  }
+
+  function reset() {
+    state.cards = shuffle([...symbols, ...symbols]).map((symbol, index) => ({
+      id: `m${index}`,
+      symbol,
+      revealed: false,
+      matched: false,
+    }));
+    state.opened = [];
+    state.locked = false;
+    state.moves = 0;
+    state.matches = 0;
+    messageEl.textContent = "翻开两张相同卡片即可配对。";
+    render();
+  }
+
+  restartBtn.addEventListener("click", reset);
+  updateHud();
+  reset();
+  return state;
+})();
+gameModules.memory = memoryGame;
+
+const moleGame = (() => {
+  const gridEl = document.getElementById("moleGrid");
+  const scoreEl = document.getElementById("moleScore");
+  const timeEl = document.getElementById("moleTime");
+  const bestEl = document.getElementById("moleBest");
+  const messageEl = document.getElementById("moleMessage");
+  const startBtn = document.getElementById("moleStartBtn");
+  const bestKey = "mole-best-score";
+
+  const state = {
+    active: false,
+    running: false,
+    score: 0,
+    timeLeft: 30,
+    best: Number(localStorage.getItem(bestKey) || 0),
+    activeHole: -1,
+    tickTimer: null,
+    spawnTimer: null,
+  };
+
+  function updateHud() {
+    scoreEl.textContent = String(state.score);
+    timeEl.textContent = String(state.timeLeft);
+    bestEl.textContent = String(state.best);
+  }
+
+  function render() {
+    gridEl.innerHTML = "";
+    for (let i = 0; i < 9; i += 1) {
+      const hole = document.createElement("div");
+      hole.className = "mole-hole";
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = `mole-btn${state.activeHole === i ? " active" : ""}`;
+      button.textContent = "🐹";
+      button.addEventListener("click", () => {
+        if (!state.running || state.activeHole !== i) {
+          return;
+        }
+        state.score += 1;
+        state.activeHole = -1;
+        messageEl.textContent = "命中。";
+        updateHud();
+        render();
+      });
+      hole.appendChild(button);
+      gridEl.appendChild(hole);
+    }
+  }
+
+  function stopGame() {
+    state.running = false;
+    clearInterval(state.tickTimer);
+    clearInterval(state.spawnTimer);
+    state.activeHole = -1;
+    if (state.score > state.best) {
+      state.best = state.score;
+      localStorage.setItem(bestKey, String(state.best));
+    }
+    messageEl.textContent = `时间到，本局得分 ${state.score}。`;
+    updateHud();
+    render();
+  }
+
+  function startGame() {
+    clearInterval(state.tickTimer);
+    clearInterval(state.spawnTimer);
+    state.running = true;
+    state.score = 0;
+    state.timeLeft = 30;
+    state.activeHole = -1;
+    messageEl.textContent = "开始打地鼠。";
+    updateHud();
+    render();
+
+    state.tickTimer = setInterval(() => {
+      state.timeLeft -= 1;
+      updateHud();
+      if (state.timeLeft <= 0) {
+        stopGame();
+      }
+    }, 1000);
+
+    state.spawnTimer = setInterval(() => {
+      state.activeHole = Math.floor(Math.random() * 9);
+      render();
+    }, 520);
+  }
+
+  startBtn.addEventListener("click", startGame);
+  updateHud();
+  render();
+  return state;
+})();
+gameModules.mole = moleGame;
 
 switchGame("star");

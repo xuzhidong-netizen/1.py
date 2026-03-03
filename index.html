@@ -30,11 +30,26 @@
             <strong>斗地主小游戏</strong>
             <small>单机快速局，和两个 AI 对战。</small>
           </button>
+          <button class="game-card" data-game-select="ttt">
+            <span class="game-card-tag">策略</span>
+            <strong>井字棋</strong>
+            <small>和电脑轮流落子，先连成三子获胜。</small>
+          </button>
+          <button class="game-card" data-game-select="memory">
+            <span class="game-card-tag">益智</span>
+            <strong>记忆翻牌</strong>
+            <small>翻开相同图案配对，尽量少走步数。</small>
+          </button>
+          <button class="game-card" data-game-select="mole">
+            <span class="game-card-tag">反应</span>
+            <strong>打地鼠</strong>
+            <small>30 秒快打模式，地鼠冒头就点它。</small>
+          </button>
         </div>
 
         <div class="lobby-notes">
           <p>统一大厅入口，后续新增游戏按同样方式挂载。</p>
-          <p>当前已接入 2 个游戏模块。</p>
+          <p>当前已接入 5 个游戏模块。</p>
           <p>界面支持桌面和手机宽度。</p>
         </div>
       </section>
@@ -171,6 +186,86 @@
             <button id="ddzPassBtn" class="ghost" type="button">不出</button>
             <button id="ddzHintBtn" class="ghost" type="button">提示</button>
           </div>
+        </article>
+
+        <article class="game-panel" data-game-panel="ttt">
+          <div class="panel-head">
+            <div>
+              <p class="panel-tag">TACTIC</p>
+              <h2>井字棋</h2>
+            </div>
+            <div class="panel-actions">
+              <button id="tttRestartBtn" class="primary" type="button">重新开始</button>
+            </div>
+          </div>
+          <div class="mini-topbar">
+            <div class="stat">
+              <span>当前回合</span>
+              <strong id="tttTurn">你</strong>
+            </div>
+            <div class="stat highlight">
+              <span>比分</span>
+              <strong id="tttScore">0 : 0</strong>
+            </div>
+          </div>
+          <p id="tttMessage" class="panel-message">你使用 X，电脑使用 O。</p>
+          <div id="tttBoard" class="ttt-board" aria-label="井字棋棋盘"></div>
+        </article>
+
+        <article class="game-panel" data-game-panel="memory">
+          <div class="panel-head">
+            <div>
+              <p class="panel-tag">MEMORY</p>
+              <h2>记忆翻牌</h2>
+            </div>
+            <div class="panel-actions">
+              <button id="memoryRestartBtn" class="primary" type="button">重新洗牌</button>
+            </div>
+          </div>
+          <div class="mini-topbar">
+            <div class="stat">
+              <span>步数</span>
+              <strong id="memoryMoves">0</strong>
+            </div>
+            <div class="stat">
+              <span>配对</span>
+              <strong id="memoryPairs">0 / 8</strong>
+            </div>
+            <div class="stat highlight">
+              <span>最好成绩</span>
+              <strong id="memoryBest">-</strong>
+            </div>
+          </div>
+          <p id="memoryMessage" class="panel-message">翻开两张相同卡片即可配对。</p>
+          <div id="memoryGrid" class="memory-grid" aria-label="记忆翻牌区域"></div>
+        </article>
+
+        <article class="game-panel" data-game-panel="mole">
+          <div class="panel-head">
+            <div>
+              <p class="panel-tag">ARCADE</p>
+              <h2>打地鼠</h2>
+            </div>
+            <div class="panel-actions">
+              <button id="moleStartBtn" class="primary" type="button">开始 30 秒挑战</button>
+            </div>
+          </div>
+          <div class="mini-topbar">
+            <div class="stat">
+              <span>得分</span>
+              <strong id="moleScore">0</strong>
+            </div>
+            <div class="stat">
+              <span>时间</span>
+              <strong id="moleTime">30</strong>
+            </div>
+            <div class="stat highlight">
+              <span>最高分</span>
+              <strong id="moleBest">0</strong>
+            </div>
+          </div>
+          <p id="moleMessage" class="panel-message">点击冒出来的地鼠，空点不扣分。</p>
+          <div id="moleGrid" class="mole-grid" aria-label="打地鼠区域"></div>
         </article>
       </section>
     </main>
