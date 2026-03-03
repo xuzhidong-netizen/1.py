@@ -495,6 +495,8 @@ canvas {
   min-height: 120px;
   border: 1px solid var(--line-strong);
   border-radius: 22px;
+  display: grid;
+  place-items: center;
   background:
     linear-gradient(135deg, rgba(255, 209, 102, 0.08), rgba(121, 224, 255, 0.05)),
     rgba(255, 255, 255, 0.04);
@@ -515,6 +517,8 @@ canvas {
 .memory-card {
   position: relative;
   min-height: 110px;
+  display: grid;
+  place-items: center;
   border: 1px solid var(--line-strong);
   border-radius: 20px;
   background: rgba(255, 255, 255, 0.05);
@@ -570,6 +574,7 @@ canvas {
   bottom: -6px;
   width: 74px;
   height: 74px;
+  z-index: 1;
   transform: translate(-50%, 90%);
   border: 0;
   border-radius: 50%;
@@ -581,7 +586,7 @@ canvas {
 }
 
 .mole-btn.active {
-  transform: translate(-50%, -6%);
+  transform: translate(-50%, -18%);
 }
 
 .card,

@@ -85,6 +85,15 @@ function switchGame(gameId) {
   }
 }
 
+function runCurrentGame() {
+  const module = gameModules[currentGameId];
+  if (module && typeof module.start === "function") {
+    module.start();
+  } else {
+    switchGame(currentGameId);
+  }
+}
+
 gameButtons.forEach((button) => {
   button.addEventListener("click", () => switchGame(button.dataset.gameSelect));
 });
@@ -492,6 +501,7 @@ const starGame = (() => {
   drawScene();
   requestAnimationFrame(loop);
 
+  state.start = startGame;
   return state;
 })();
 gameModules.star = starGame;
@@ -1088,6 +1098,7 @@ const douDiZhu = (() => {
 
   startRound();
   state.onActivate = queueAiTurnIfNeeded;
+  state.start = startRound;
   return state;
 })();
 gameModules.ddz = douDiZhu;
@@ -1227,6 +1238,7 @@ const ticTacToe = (() => {
 
   restartBtn.addEventListener("click", resetRound);
   resetRound();
+  state.start = resetRound;
   return state;
 })();
 gameModules.ttt = ticTacToe;
@@ -1353,6 +1365,7 @@ const memoryGame = (() => {
   restartBtn.addEventListener("click", reset);
   updateHud();
   reset();
+  state.start = reset;
   return state;
 })();
 gameModules.memory = memoryGame;
@@ -1375,6 +1388,7 @@ const moleGame = (() => {
     activeHole: -1,
     tickTimer: null,
     spawnTimer: null,
+    hideTimer: null,
   };
 
   function updateHud() {
@@ -1411,6 +1425,7 @@ const moleGame = (() => {
     state.running = false;
     clearInterval(state.tickTimer);
     clearInterval(state.spawnTimer);
+    clearTimeout(state.hideTimer);
     state.activeHole = -1;
     if (state.score > state.best) {
       state.best = state.score;
@@ -1424,6 +1439,7 @@ const moleGame = (() => {
   function startGame() {
     clearInterval(state.tickTimer);
     clearInterval(state.spawnTimer);
+    clearTimeout(state.hideTimer);
     state.running = true;
     state.score = 0;
     state.timeLeft = 30;
@@ -1443,18 +1459,24 @@ const moleGame = (() => {
     state.spawnTimer = setInterval(() => {
       state.activeHole = Math.floor(Math.random() * 9);
       render();
-    }, 520);
+      clearTimeout(state.hideTimer);
+      state.hideTimer = setTimeout(() => {
+        state.activeHole = -1;
+        render();
+      }, 650);
+    }, 900);
   }
 
   startBtn.addEventListener("click", startGame);
   updateHud();
   render();
+  state.start = startGame;
   return state;
 })();
 gameModules.mole = moleGame;
 
 playSelectedBtn.addEventListener("click", () => {
-  switchGame(currentGameId);
+  runCurrentGame();
   window.scrollTo({
     top: document.querySelector(`[data-game-panel="${currentGameId}"]`).offsetTop - 12,
     behavior: "smooth",
@@ -1465,6 +1487,7 @@ playRandomBtn.addEventListener("click", () => {
   const ids = Object.keys(lobbyInfo);
   const randomId = ids[Math.floor(Math.random() * ids.length)];
   switchGame(randomId);
+  runCurrentGame();
   window.scrollTo({
     top: document.querySelector(`[data-game-panel="${randomId}"]`).offsetTop - 12,
     behavior: "smooth",
